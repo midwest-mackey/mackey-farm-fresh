@@ -1,0 +1,33 @@
+section {
+    &#background {
+        clip-path: shape(from 0% 0%,
+        line to 100% 0%,
+        line to 100% 50%,
+        smooth to 50% 50% with 80% 40%,
+        smooth to 0% 45% with 10% 50%,
+        line to 0% 0%);
+        // clip-path: shape(from 0% 0%,
+        // line to 100% 0%,
+        // line to 100% 40%,
+        // smooth to 61% 30% with 80% 70%,
+        // smooth to 0% 10% with 20% 50%,
+        // line to 0% 0%);
+    }
+}
+#content, #content .container {
+        min-height: calc(100vh - 246px);
+
+}
+// Media Breakpoints
+// @include media-breakpoint-down(md) {
+//     section {
+//         &.bg-warning {
+//             clip-path: shape(from 0% 0%,
+//             line to 100% 0%,
+//             line to 100% 50%,
+//             smooth to 50% 50% with 80% 40%,
+//             smooth to 0% 45% with 10% 50%,
+//             line to 0% 0%);
+//         }
+//     }
+// }
