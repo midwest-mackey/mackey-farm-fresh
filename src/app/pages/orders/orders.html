@@ -1,0 +1,50 @@
+<section id="background" class="container-fluid d-md-flex position-absolute bg-warning overflow-hidden">
+  <div class="container">
+    <div class="row py-5">
+      <div class="col-12">
+        <h3>Your Orders</h3>
+        <small class="text-body-tertiary">Account: {{ deviceId }}</small>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="container-fluid">
+  <div class="container">
+  <div class="row py-5">
+    <div class="col-12">
+      <h3>Your Orders</h3>
+      <small class="text-body-tertiary">Account: {{ deviceId }}</small>
+    </div>
+  </div>
+  <div class="row">
+    <div *ngIf="loading" class="col-12 text-center m-5">
+      <p >Loading...</p>
+      <p *ngIf="!loading && orders.length === 0" class="col-12 text-center m-5">
+        No orders yet.
+      </p>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && orders.length > 0" class="d-flex flex-column gap-3">
+    <div *ngFor="let order of orders" class="">
+      <div class="col-12 card shadow rounded-4 border-0">
+          <div class="card-body">
+            <div class="row d-flex align-items-center">
+              <div class="col-auto pe-0 position-relative">
+                <img src="assets/chicken.png" class="" width="70" />
+              </div>
+              <div class="col">
+                <small class="text-muted">{{ order.createdAt | date:'mediumDate' }}</small>
+                <h5 class="m-0">{{ order.dozenCount }} dozen</h5>
+                <small class="text-muted">{{ order.paymentType }}</small>
+              </div>
+              <div class="col-auto">
+                <div><span class="badge text-bg-warning">{{ order.status }}</span></div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

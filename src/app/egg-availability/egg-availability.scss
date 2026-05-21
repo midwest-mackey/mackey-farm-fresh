@@ -1,0 +1,30 @@
+/* egg-availability.component.scss */
+.availability-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  padding: 1.25rem;
+  border: 2px solid;
+  transition: all 0.2s ease;
+}
+
+.content h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.status-text {
+  margin: 0;
+  font-weight: 600;
+}
+
+.available {
+  background: #eefaf0;
+  border-color: #2e7d32 !important;
+}
+
+.unavailable {
+  background: #fff4f4;
+  border-color: #c62828 !important;
+}

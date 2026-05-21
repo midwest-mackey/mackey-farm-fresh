@@ -1,0 +1,21 @@
+.nav-link {
+    // background: color.adjust($white, $alpha: -0.9);
+    &.active {
+        background: rgba(255,255,255,0.25);
+    }
+}
+.midwest-mackey-button {
+    &:hover {
+        img {
+            filter: brightness(0) saturate(100%) invert(0%) sepia(2%) saturate(7458%) hue-rotate(112deg) brightness(110%) contrast(97%);
+        }
+    }
+}
+#page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+html, body {
+    touch-action: manipulation;
+}

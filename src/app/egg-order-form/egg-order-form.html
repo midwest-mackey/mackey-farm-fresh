@@ -1,0 +1,77 @@
+<div *ngIf="!submitSuccess; else successState">
+    <div class="mb-5">
+        <app-egg-availability [available]="true"></app-egg-availability>
+    </div>
+    <h1 class="text-center mb-3 display-6">Order Eggs</h1>
+    <form [formGroup]="orderForm" (ngSubmit)="submitOrder()" novalidate>
+        <!-- Name -->
+        <div class="form-floating mb-3">
+            <input id="name" type="text" class="form-control" formControlName="name" placeholder=" " [class.is-invalid]="f['name'].touched && f['name'].invalid"/>
+            <label for="name">Name</label>
+            <div class="invalid-feedback">
+                Name is required
+            </div>
+        </div>
+        <!-- Phone Number -->
+        <div class="form-floating mb-3">
+            <input id="phone" type="tel" class="form-control" placeholder=" " formControlName="phoneNumber" maxlength="14" (input)="onPhoneInput($event)" [value]="formattedPhone" [class.is-invalid]="f['phoneNumber'].touched && f['phoneNumber'].invalid"/>
+            <label for="phone">Phone number</label>
+            <div class="invalid-feedback">
+                Please enter a valid phone number
+            </div>
+        </div>
+
+        <!-- Payment Type -->
+        <div class="form-floating mb-4">
+            <select id="payment" class="form-select" formControlName="paymentType">
+                <option *ngFor="let payment of paymentTypes" [value]="payment.value">{{ payment.label }}</option>
+            </select>
+            <label for="payment">Payment type</label>
+        </div>
+        <!-- Pickup -->
+        <div class="form-floating mb-4">
+            <select id="pickup" class="form-select" formControlName="pickupDate">
+                <option *ngFor="let pickup of pickupDates" [value]="pickup.value">{{ pickup.label }}</option>
+            </select>
+            <label for="pickup">Preferred pickup date</label>
+        </div>
+        <div class=" rounded-3 mb-4">
+            <div class="">
+                <div class="row d-flex align-items-center">
+                    <div class="col-auto">
+                        <!-- Dozen Counter -->
+                        <div class="input-group quantity-group">
+                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="decreaseDozen()">−</button>
+                            <div class="form-floating">
+                                <input id="quantity" class="form-control text-center" formControlName="dozenCount" placeholder=" " (input)="onDozenChange()"/>
+                                <label for="quantity" class="label-quantity">Quantity</label>
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="increaseDozen()">+</button>
+                        </div>
+                    </div>
+                    <div class="col text-end">
+                        <small class="text-muted">${{ unitEggPrice }} per dozen</small>
+                        <h3 class="fw-bold">Total: ${{ f['dozenCount'].value * unitEggPrice }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Submit -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-warning btn-lg">Request Eggs</button>
+        </div>
+    </form>
+</div>
+<ng-template #successState>
+<div class="text-center p-5">
+    <img class="img-fluid"src="assets/chicken-party.png"/>
+    <h3 class="mb-3">Order received</h3>
+    <p class="mb-4">Thanks <strong>{{ submittedOrder?.name }}</strong>, we’ll have your eggs ready for <strong>{{ submittedOrder?.pickupDate }}</strong></p>
+    <p class="text-success small mb-5"><fa-icon [icon]="faCheck"></fa-icon> You should recieve a confirmation text with details</p>
+    
+    <div class="d-flex flex-column gap-3 col-auto mx-auto">
+        <button class="btn btn-outline-dark" (click)="submitSuccess = false"> Place another order</button>
+        <a class="btn btn-outline-dark border-0" routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">🧺 view orders</a>
+    </div>
+</div>
+</ng-template>
