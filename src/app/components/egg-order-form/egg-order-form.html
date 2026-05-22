@@ -1,11 +1,12 @@
 <div *ngIf="!submitSuccess; else successState">
-    <div class="mb-5">
-        <app-egg-availability [available]="true"></app-egg-availability>
-    </div>
+    
     <h1 class="text-center mb-3 display-6">Order Eggs</h1>
+
+    <app-egg-availability [available]="true"></app-egg-availability>
+    
     <form [formGroup]="orderForm" (ngSubmit)="submitOrder()" novalidate>
         <!-- Name -->
-        <div class="form-floating mb-3">
+        <div class="form-floating my-3">
             <input id="name" type="text" class="form-control" formControlName="name" placeholder=" " [class.is-invalid]="f['name'].touched && f['name'].invalid"/>
             <label for="name">Name</label>
             <div class="invalid-feedback">

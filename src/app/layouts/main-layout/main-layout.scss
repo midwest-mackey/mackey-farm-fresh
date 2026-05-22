@@ -1,0 +1,17 @@
+.nav-link {
+    &:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+    &.active, &:active {
+        background: #212529;
+        color: #fff !important;
+    }
+
+}
+.midwest-mackey-button {
+    &:hover {
+        img {
+            filter: brightness(0) saturate(100%) invert(0%) sepia(2%) saturate(7458%) hue-rotate(112deg) brightness(110%) contrast(97%);
+        }
+    }
+}

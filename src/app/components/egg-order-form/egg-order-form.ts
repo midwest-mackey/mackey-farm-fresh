@@ -5,8 +5,8 @@ import {
   Validators
 } from '@angular/forms';
 
-import { OrdersService } from '../services/orders.service';
-import { DeviceService } from '../services/device.service';
+import { OrdersService } from '../../services/orders.service';
+import { DeviceService } from '../../services/device.service';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
 @Component({

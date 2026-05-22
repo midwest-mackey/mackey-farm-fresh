@@ -64,11 +64,11 @@ export class Orders implements OnInit, OnDestroy {
 
   getStatusClass(status: string) {
     switch (status) {
-      case 'requested': return 'bg-warning';
-      case 'ready': return 'bg-info';
-      case 'completed': return 'bg-success';
-      case 'cancelled': return 'bg-danger';
-      default: return 'bg-secondary';
+      case 'pending': return 'text-bg-warning';
+      case 'ready': return 'text-bg-info';
+      case 'completed': return 'text-bg-success';
+      case 'cancelled': return 'text-bg-danger';
+      default: return 'text-bg-secondary';
     }
   }
   ngOnDestroy() {

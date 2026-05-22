@@ -36,7 +36,7 @@ export class OrdersService {
 
   submitOrder(order: any) {
     return this.http.post(
-      `${this.apiUrl}/orders/eggs`,
+      `${this.apiUrl}/orders/all`,
       order
     );
   }
@@ -47,12 +47,27 @@ export class OrdersService {
     );
   }
 
-  refreshOrderState() {
-  const deviceId = this.deviceService.getDeviceId();
+  getAllOrders() {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/orders/all`
+    );
+  }
 
-  this.http.get<any[]>(`${this.apiUrl}/orders/history?deviceId=${deviceId}`)
-    .subscribe(orders => {
-      this.hasOrdersSubject.next(orders.length > 0);
-    });
-}
+  refreshOrderState() {
+    const deviceId = this.deviceService.getDeviceId();
+
+    this.http.get<any[]>(`${this.apiUrl}/orders/history?deviceId=${deviceId}`)
+      .subscribe(orders => {
+        this.hasOrdersSubject.next(orders.length > 0);
+      });
+  }
+  updateOrderStatus(
+    orderId: number,
+    status: string
+  ) {
+    return this.http.patch(
+      `${this.apiUrl}/orders/all/${orderId}/status`,
+      { status }
+    );
+  }
 }

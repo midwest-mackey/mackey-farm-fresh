@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -12,6 +13,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class LoginPage {
 
+  faArrowLeft = faArrowLeft;
   username = 'midwest.mackey';
   password = '2015Luman!';
   error = false;
