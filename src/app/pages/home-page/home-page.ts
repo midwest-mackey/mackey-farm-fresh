@@ -8,6 +8,8 @@ import { faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
   styleUrl: './home-page.scss',
 })
 export class HomePage {
+
   faPhone = faPhone;
   faMessage = faCommentSms;
+  
 }

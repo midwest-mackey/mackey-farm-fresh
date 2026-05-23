@@ -21,19 +21,24 @@ export class App implements OnInit {
   hasOrders$!: Observable<boolean>;
   unitEggPrice = 0;
 
-  constructor(private ordersService: OrdersService, public auth: AuthService) {}
+  constructor(
+    private ordersService: OrdersService,
+    public auth: AuthService
+  ) {}
 
   ngOnInit() {
     this.hasOrders$ = this.ordersService.hasOrders$;
 
     this.ordersService.refreshOrderState();
 
-    // ✅ single pricing fetch
-    this.ordersService.getPricing().subscribe(res => {
-      this.ordersService.setPricing(res.unitEggPrice);
+    this.ordersService.refreshSettings();
+
+    this.ordersService.settings$.subscribe((settings) => {
+      if (settings?.unitEggPrice != null) {
+        this.unitEggPrice = settings.unitEggPrice;
+      }
     });
 
-    // optional initial background setup
     this.updatePageBackground();
   }
 
@@ -43,11 +48,10 @@ export class App implements OnInit {
   }
 
   private updatePageBackground() {
-    const scrolled = window.scrollY > 300;
+    const scrolled = window.scrollY > 150;
     const color = scrolled ? '#ffffff' : '#FFC107';
 
     document.documentElement.style.backgroundColor = color;
     document.body.style.backgroundColor = color;
   }
-
 }

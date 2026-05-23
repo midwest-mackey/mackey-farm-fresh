@@ -1,4 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { OrdersService } from '../../services/orders.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-egg-availability',
@@ -6,6 +8,23 @@ import { Component, Input } from '@angular/core';
   templateUrl: './egg-availability.html',
   styleUrl: './egg-availability.scss',
 })
-export class EggAvailability {
-    @Input() available = false;
+export class EggAvailability implements OnInit, OnDestroy {
+
+  available = false;
+
+  private sub = new Subscription();
+
+  constructor(private ordersService: OrdersService) {}
+
+  ngOnInit() {
+    this.sub.add(
+      this.ordersService.settings$.subscribe(settings => {
+        this.available = settings?.eggsAvailable ?? false;
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
 }

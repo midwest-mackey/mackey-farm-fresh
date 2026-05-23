@@ -6,6 +6,9 @@ import { ChangeDetectorRef } from '@angular/core';
 import { OrdersService } from '../../services/orders.service';
 import { DeviceService } from '../../services/device.service';
 
+import { faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
+
+
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.html',
@@ -14,7 +17,11 @@ import { DeviceService } from '../../services/device.service';
 })
 export class Orders implements OnInit, OnDestroy {
 
+  faPhone = faPhone;
+  faMessage = faCommentSms;  
+
   orders: any[] = [];
+  newestOrder: any;
   loading = true;
 
   deviceId: string;
@@ -46,11 +53,13 @@ export class Orders implements OnInit, OnDestroy {
   loadOrders() {
     this.loading = true;
     this.orders = [];
+    this.newestOrder = null;
 
     this.ordersService.getMyOrders(this.deviceId)
       .subscribe({
         next: (data) => {
           this.orders = [...(data ?? [])];
+          this.newestOrder = this.orders[0] ?? null;
           this.loading = false;
           this.cdr.detectChanges();
         },
@@ -62,15 +71,40 @@ export class Orders implements OnInit, OnDestroy {
       });
   }
 
+  reorder(order: any) {
+    this.ordersService.reorder(order.id).subscribe({
+      next: () => {
+        this.loadOrders(); // refresh list
+      },
+      error: (err) => {
+        console.error('Reorder failed', err);
+      }
+    });
+  }
+
+  canReorder(order: any): boolean {
+    return ['completed', 'cancelled'].includes(order.status);
+  }
+
   getStatusClass(status: string) {
     switch (status) {
-      case 'pending': return 'text-bg-warning';
-      case 'ready': return 'text-bg-info';
-      case 'completed': return 'text-bg-success';
-      case 'cancelled': return 'text-bg-danger';
-      default: return 'text-bg-secondary';
+      case 'requested': return 'text-bg-warning';
+      case 'approved': return 'text-bg-success approved';
+      case 'modified': return 'text-bg-danger';
+      case 'ready': return 'text-bg-success';
+      case 'completed': return 'text-bg-secondary';
+      case 'cancelled': return 'text-bg-dark';
+      default: return 'text-bg-primary';
     }
   }
+  getSmsLink(): string {
+    if (!this.newestOrder) return '';
+
+    const msg = `🥚 Hey, this is ${this.newestOrder.name}, I have a question about my most recent order.`;
+
+    return `sms:5155180989?body=${encodeURIComponent(msg)}`;
+  }
+  
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

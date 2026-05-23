@@ -32,13 +32,15 @@ export class EggOrderForm {
   pickupDates = [
     { label: 'Today', value: 'today' },
     { label: 'Tomorrow', value: 'tomorrow' },
-    { label: 'In 2 Days', value: 'in_2_days' },
+    { label: 'In 2 Days', value: 'in 2 days' },
   ];
 
   // 👇 holds formatted display value only
   formattedPhone = '';
   submittedOrder: any = null;
   
+  available = true;
+
   constructor(
     private fb: FormBuilder,
     private ordersService: OrdersService,
@@ -48,22 +50,14 @@ export class EggOrderForm {
 
     this.orderForm = this.fb.group({
       name: ['', Validators.required],
-
-      // IMPORTANT: now stores RAW digits only
-      phoneNumber: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{10}$/)
-        ]
-      ],
-
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       paymentType: ['cash', Validators.required],
-      dozenCount: [
-        1,
-        [Validators.required, Validators.min(1)]
-      ],
+      dozenCount: [1, [Validators.required, Validators.min(1)]],
       pickupDate: ['today', Validators.required]
+    });
+
+    this.ordersService.settings$.subscribe(settings => {
+      this.available = settings?.eggsAvailable ?? true;
     });
   }
 
@@ -184,4 +178,5 @@ export class EggOrderForm {
         }
       });
   }
+
 }

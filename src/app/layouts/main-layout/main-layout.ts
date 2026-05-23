@@ -28,15 +28,14 @@ export class MainLayout {
 
   ngOnInit() {
     this.hasOrders$ = this.ordersService.hasOrders$;
-
     this.ordersService.refreshOrderState();
-
-    // ✅ single pricing fetch
-    this.ordersService.getPricing().subscribe(res => {
-      this.ordersService.setPricing(res.unitEggPrice);
+    this.ordersService.refreshSettings();
+    this.ordersService.settings$.subscribe(settings => {
+      if (settings?.unitEggPrice != null) {
+        this.unitEggPrice = settings.unitEggPrice;
+      }
     });
 
-    // optional initial background setup
     this.updatePageBackground();
   }
 
