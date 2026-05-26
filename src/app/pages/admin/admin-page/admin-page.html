@@ -16,8 +16,9 @@
         <div *ngIf="!loading && orders.length > 0" class="d-flex flex-column gap-3">
             <div *ngFor="let order of orders" class="">
                 <div class="col-12 card shadow rounded-4 border-0">
-                    <div class="card-body pb-0" (click)="startEdit(order)">
+                    <div class="card-body" (click)="startEdit(order)">
                         <div class="pb-3 text-center" (click)="startEdit(order)">
+                            <small class="text-muted position-absolute top-0 end-0 pe-4 pt-3">{{ order.id }}</small>
                             <small class="text-muted">Order Placed:<br> {{ order.createdAt | date:'mediumDate' }}</small>
                             <small class="small text-muted"> for pickup <span class="text-success">{{ order.pickupDate }}</span></small>
                         </div>
@@ -39,9 +40,9 @@
                          <button *ngIf="editingOrderId !== order.id" class="btn btn-outline-dark mt-3 w-100"><fa-icon [icon]="faEdit"></fa-icon> Update order</button> 
                     </div>
                     <!-- EXPANDED EDIT -->
-                    <div class="card-footer py-3 mt-3 bg-light" *ngIf="editingOrderId === order.id">
+                    <div class="card-body py-3 border-top border-1 rounded-bottom-4" *ngIf="editingOrderId === order.id">
                         <div class="mb-4 text-center">
-                            <h4 class=""><fa-icon [icon]="faEdit"></fa-icon> Update Order</h4>
+                            <h5 class=""><fa-icon [icon]="faEdit"></fa-icon> Update Order</h5>
                             <div class="row mb-2">
                                 <small class="text-muted mb-2">Status</small>
                                 <div class="col-12 d-flex gap-2 flex-wrap justify-content-center">
@@ -66,7 +67,7 @@
                             <button class="btn btn-outline-dark flex-grow-1 flex-md-grow-0" (click)="cancelEdit()"><fa-icon class="" [icon]="faXmark"></fa-icon> Cancel</button>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body pt-0" *ngIf="editingOrderId !== order.id">
                         <button class="btn w-100" [ngClass]="isNotified(order) ? 'btn-outline-dark' : 'btn-primary'" (click)="textCustomer(order)">
                             <fa-icon [icon]="faMessage"></fa-icon> {{ isNotified(order) ? ('Message ' + order.name) : ('Notify ' + order.name + ' order ' + order.status)}}
                         </button>      

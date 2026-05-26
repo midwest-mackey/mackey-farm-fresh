@@ -34,7 +34,9 @@
               <div class="col">
                 <small class="text-muted">{{ order.createdAt | date:'mediumDate' }}</small>
                 <h5 class="m-0 sigmar-regular">{{ order.dozenCount }} dozen</h5>
-                <small class="text-muted">{{ order.paymentType }}</small>
+                <div class="d-flex gap-1 align-items-center">
+                    <span class="small text-muted">Total: ${{ order.totalPrice }}</span><small class="payment-badge"><small><span class="badge text-bg-success">{{ order.paymentType }}</span></small></small>
+                </div>
               </div>
               <div class="col-auto d-flex flex-column gap-2 align-items-end">
                 <h5 class="m-0"><span class="badge" [ngClass]="getStatusClass(order.status)">{{ order.status }}</span></h5>
