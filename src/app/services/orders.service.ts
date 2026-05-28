@@ -51,7 +51,7 @@ export class OrdersService {
 
   updateSettings(payload: Partial<AppSettings>) {
     return this.http.patch(
-      `${this.apiUrl}/orders/settings`,
+      `${this.apiUrl}/admin/orders/settings`,
       payload
     );
   }
@@ -113,10 +113,14 @@ export class OrdersService {
 
   getAllOrders() {
     return this.http.get<any[]>(
-      `${this.apiUrl}/orders/all`
+      `${this.apiUrl}/admin/orders/all`
     );
   }
 
+  getOrderById(id: string) {
+    return this.http.get<any>(`/api/orders/${id}`);
+  }
+  
   reorder(orderId: number) {
     return this.http.post(
       `${this.apiUrl}/orders/reorder/${orderId}`,
@@ -136,14 +140,14 @@ export class OrdersService {
 
   updateOrder(orderId: number, payload: any) {
     return this.http.patch(
-      `${this.apiUrl}/orders/all/${orderId}/update`,
+      `${this.apiUrl}/admin/orders/${orderId}/update`,
       payload
     );
   }
 
   markNotified(id: number, status: string) {
     return this.http.patch(
-      `${this.apiUrl}/orders/all/${id}/notified`,
+      `${this.apiUrl}/admin/orders/${id}/notified`,
       { status }
     );
   }

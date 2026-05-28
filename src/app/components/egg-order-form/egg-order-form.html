@@ -21,10 +21,9 @@
                 Please enter a valid phone number
             </div>
         </div>
-
         <!-- Payment Type -->
         <div class="form-floating mb-4">
-            <select id="payment" class="form-select" formControlName="paymentType">
+            <select id="payment" class="form-select" formControlName="paymentType" >
                 <option *ngFor="let payment of paymentTypes" [value]="payment.value">{{ payment.label }}</option>
             </select>
             <label for="payment">Payment type</label>
@@ -36,18 +35,32 @@
             </select>
             <label for="pickup">Preferred pickup date</label>
         </div>
+        <!-- Egg Condition -->
+        <div class="form-floating mb-4">
+            <select id="eggCondition" class="form-select" formControlName="eggCondition">
+                <option value="washed">Washed</option>
+                <option value="unwashed">Unwashed</option>
+            </select>
+            <label for="eggCondition">Egg Preparation</label>
+            <small><small class="text-muted d-block mt-2 label-push-right">{{ eggConditionHelperText }}</small></small>
+        </div>
+        <!-- Notes -->
+        <div class="mb-4 text-center">
+            <button *ngIf="!showNotes" type="button" class="btn btn-outline-primary border-0 w-100" (click)="toggleNotes()">Add a note</button>
+            <textarea *ngIf="showNotes" id="notes" class="form-control" formControlName="orderNotes" rows="3" placeholder="Anything we should know? (pickup timing, preferences, etc.)"></textarea>
+        </div>
         <div class=" rounded-3 mb-4">
             <div class="">
                 <div class="row d-flex align-items-center">
                     <div class="col-auto">
                         <!-- Dozen Counter -->
                         <div class="input-group quantity-group">
-                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="decreaseDozen()">−</button>
+                            <button type="button" class="btn btn-outline-dark btn-lg" (click)="decreaseDozen()">−</button>
                             <div class="form-floating">
                                 <input id="quantity" class="form-control text-center" formControlName="dozenCount" placeholder=" " (input)="onDozenChange()"/>
                                 <label for="quantity" class="label-quantity">Quantity</label>
                             </div>
-                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="increaseDozen()">+</button>
+                            <button type="button" class="btn btn-outline-dark btn-lg" (click)="increaseDozen()">+</button>
                         </div>
                     </div>
                     <div class="col text-end">
@@ -64,15 +77,27 @@
     </form>
 </div>
 <ng-template #successState>
-<div class="text-center p-5">
+<div class="text-center p-5 pb-3">
     <img class="img-fluid"src="assets/chicken-party.png"/>
-    <h3 class="mb-3">Order received</h3>
-    <p class="mb-4">Thanks <strong>{{ submittedOrder?.name }}</strong>, we will do our best to have your eggs ready {{ submittedOrder?.pickupDate }}</p>
-    <p class="text-success small mb-5"><fa-icon [icon]="faCheck"></fa-icon> You may recieve order updates by text or check back for order status</p>
-    
-    <div class="d-flex flex-column gap-3 col-auto mx-auto">
-        <button class="btn btn-outline-dark" (click)="submitSuccess = false"> Place another order</button>
-        <a class="btn btn-outline-dark border-0" routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">🧺 view orders</a>
-    </div>
+    <h3 class="mb-3 display-6">Order received</h3>
+    <p class="pb-0">Thanks <strong>{{ submittedOrder?.name }}</strong>, we will do our best to have your eggs ready {{ submittedOrder?.pickupDate }}</p>
 </div>
+<div class="d-flex flex-column gap-3 mb-5">
+    <p class="text-success border border-success rounded-2 p-2 text-start small d-flex align-items-center mb-0">
+        <fa-icon class="me-2" [icon]="faCheck"></fa-icon>
+        <span>You may receive updates via text or check back here for updates</span>
+    </p>
+    <p *ngIf="submittedOrder?.paymentType === 'venmo'" class="small border border-primary rounded-2 p-2 text-primary text-start small d-flex align-items-center mb-0">
+        <fa-icon class="me-2" [icon]="faVenmo"></fa-icon>
+        <span>Payment details once request is approved</span>
+    </p>
+    <p *ngIf="submittedOrder?.paymentType === 'cash'" class="small border border-secondary rounded-2 p-2 text-secondary text-start small d-flex align-items-center mb-0">
+        <fa-icon class="me-2" [icon]="faDollarSign"></fa-icon>
+        <span>Cash payment will be collected at pickup</span>
+    </p>
+</div>
+    <div class="d-flex flex-column gap-3 col-auto mx-auto">
+        <a class="btn btn-outline-dark border-0" routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">🧺 check your order status</a>
+        <button class="btn btn-outline-dark border-0" (click)="submitSuccess = false"> Place another order</button>
+    </div>
 </ng-template>

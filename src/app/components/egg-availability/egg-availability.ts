@@ -1,6 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OrdersService } from '../../services/orders.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-egg-availability',
@@ -8,23 +7,18 @@ import { Subscription } from 'rxjs';
   templateUrl: './egg-availability.html',
   styleUrl: './egg-availability.scss',
 })
-export class EggAvailability implements OnInit, OnDestroy {
+export class EggAvailability implements OnInit {
 
   available = false;
-
-  private sub = new Subscription();
 
   constructor(private ordersService: OrdersService) {}
 
   ngOnInit() {
-    this.sub.add(
-      this.ordersService.settings$.subscribe(settings => {
-        this.available = settings?.eggsAvailable ?? false;
-      })
-    );
-  }
+    // 🔥 force sync refresh when component mounts
+    this.ordersService.refreshSettings();
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.ordersService.settings$.subscribe(settings => {
+      this.available = settings?.eggsAvailable ?? false;
+    });
   }
 }

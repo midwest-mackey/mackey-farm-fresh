@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
 import { OrdersService } from '../../../services/orders.service';
-import { faCheck, faCircleCheck, faEdit, faXmark, faCommentSms } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleCheck, faQuoteLeft, faQuoteRight, faEdit, faXmark, faCommentSms } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-admin-page',
@@ -15,6 +15,8 @@ export class AdminPage implements OnInit, OnDestroy {
 
   faEdit = faEdit;
   faCheck = faCheck;
+  faQuoteLeft = faQuoteLeft;
+  faQuoteRight = faQuoteRight;
   faCircleCheck = faCircleCheck;
   faXmark = faXmark;
   faMessage = faCommentSms;  
@@ -72,18 +74,28 @@ export class AdminPage implements OnInit, OnDestroy {
       });
   }
 
+  showCompleted = false;
+
+  get activeOrders() {
+    return this.orders.filter(o => o.status !== 'completed' || !this.isNotified(o));
+  }
+
+  get completedOrders() {
+    return this.orders.filter(o => o.status === 'completed' && this.isNotified(o));
+  }
+
   // -------------------------
   // STATUS UI
   // -------------------------
   getStatusClass(status: string) {
     switch (status) {
-      case 'requested': return 'text-bg-warning';
-      case 'approved': return 'text-bg-success approved';
-      case 'modified': return 'text-bg-danger';
-      case 'ready': return 'text-bg-success';
-      case 'completed': return 'text-bg-secondary';
-      case 'cancelled': return 'text-bg-dark';
-      default: return 'text-bg-primary';
+      case 'requested': return 'badge text-bg-warning';
+      case 'approved': return 'badge text-bg-success';
+      case 'modified': return 'badge text-bg-danger';
+      case 'ready': return 'badge text-bg-success';
+      case 'completed': return 'badge text-bg-success';
+      case 'cancelled': return 'badge text-bg-dark';
+      default: return 'badge text-bg-primary';
     }
   }
 
@@ -148,7 +160,7 @@ export class AdminPage implements OnInit, OnDestroy {
         return `🎉 ${order.name}, your ${order.dozenCount} dozen egg order is ready for pickup, your total is $${order.totalPrice}, what time ${order.pickupDate} works for you to pickup?`;
 
       case 'completed':
-        return `🐔 Your order is complete! We appreciate your support of Mackey Farm Fresh Eggs, we look forward to your next order!`;
+        return `🐔 Your order is complete! We appreciate your support of Mackey's Farm Fresh Eggs, we look forward to your next order!`;
 
       case 'cancelled':
         return `🐔 Hey ${order.name}, unfortunately we aren't able to fulfill your order at this time, we will reach out with additional details.`;

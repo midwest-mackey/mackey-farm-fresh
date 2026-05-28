@@ -1,26 +1,27 @@
 
 <div class="container-fluid">
     <div class="container">
-        <div class="row pb-3">
+        <div class="row mb-3">
             <div class="col-12">
                 <h1 class="display-6">All Orders</h1>
             </div>
         </div>
         <div class="row">
-            <div *ngIf="loading" class="col-12 text-center m-5">
-                <p >Loading...</p>
-                <p *ngIf="!loading && orders.length === 0" class="col-12 text-center m-5">No orders yet.</p>
+            <div *ngIf="loading || orders.length === 0" class="col-12 text-center my-5">
+                <p *ngIf="loading">Loading...</p>
+                <p *ngIf="!loading && orders.length === 0" class="text-center my-5">No orders yet</p>
             </div>
         </div>
-        
         <div *ngIf="!loading && orders.length > 0" class="d-flex flex-column gap-3">
-            <div *ngFor="let order of orders" class="">
+            <div *ngFor="let order of activeOrders">
                 <div class="col-12 card shadow rounded-4 border-0">
-                    <div class="card-body" (click)="startEdit(order)">
-                        <div class="pb-3 text-center" (click)="startEdit(order)">
-                            <small class="text-muted position-absolute top-0 end-0 pe-4 pt-3">{{ order.id }}</small>
-                            <small class="text-muted">Order Placed:<br> {{ order.createdAt | date:'mediumDate' }}</small>
-                            <small class="small text-muted"> for pickup <span class="text-success">{{ order.pickupDate }}</span></small>
+                    <div class="card-body">
+                        <div class="pb-3 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Placed: {{ order.createdAt | date:'mediumDate' }}<span *ngIf="order.status !== 'completed'" class="text-muted"> for pickup <span class="text-success">{{ order.pickupDate }}</span></span></small>
+                            <div>
+                                <span *ngIf="order.status === 'completed'" class="me-2" [ngClass]="getStatusClass(order.status)"><fa-icon class="me-1" [icon]="faCircleCheck"></fa-icon>{{ order.status }}</span>
+                                <small class="text-muted space-mono-regular">{{ order.id }}</small>
+                            </div>
                         </div>
                         <div class="row d-flex align-items-center">
                             <div class="col-auto pe-0">
@@ -29,20 +30,24 @@
                             <div class="col">
                                 <h1 class="m-0">{{ order.name }}</h1>
                                 <div class="d-flex justify-content-between align-items-center">
-                                <h1 class="sigmar-regular display-5 lh-1"><span>{{ order.dozenCount }} </span> <span class="fs-6">Dozen</span></h1><h5 class="m-0"><span class="badge" [ngClass]="getStatusClass(order.status)">{{ order.status }}</span></h5>
+                                    <h1 class="sigmar-regular lh-1"><span>{{ order.dozenCount }} </span> <span class="fs-6">dozen {{ order.eggCondition }}</span></h1><span *ngIf="order.status !== 'completed'" [ngClass]="getStatusClass(order.status)">{{ order.status }}</span>
                                 </div>
                                 <h6 class="small fw-light text-muted m-0">${{ order.unitPrice }} per dozen</h6>
                                 <div class="d-flex gap-1 align-items-center">
-                                    <span class="small fw-bold">Total: ${{ order.totalPrice }}</span><small class="payment-badge"><small><span class="badge text-bg-success">{{ order.paymentType }}</span></small></small>
+                                    <span class="small fw-bold">Total: ${{ order.totalPrice }}</span><small class="payment-badge"><small><span class="badge text-bg-success payment-type">{{ order.paymentType }}</span><span *ngIf="order.status === 'completed'" class="ms-1 badge text-bg-success">PAID</span></small></small>
+                                </div>
+                                <div class="small text-danger mt-2" *ngIf="order.orderNotes">
+                                    <i>" {{ order.orderNotes }} "</i>
                                 </div>
                             </div>
                         </div>
-                         <button *ngIf="editingOrderId !== order.id" class="btn btn-outline-dark mt-3 w-100"><fa-icon [icon]="faEdit"></fa-icon> Update order</button> 
+
+                        <button (click)="startEdit(order)" *ngIf="editingOrderId !== order.id" class="btn btn-outline-dark mt-3 w-100"><fa-icon [icon]="faEdit"></fa-icon> Update order</button> 
                     </div>
                     <!-- EXPANDED EDIT -->
-                    <div class="card-body py-3 border-top border-1 rounded-bottom-4" *ngIf="editingOrderId === order.id">
+                    <div class="card-body bg-body-secondary py-3 border-top border-1 rounded-bottom-4" *ngIf="editingOrderId === order.id">
                         <div class="mb-4 text-center">
-                            <h5 class=""><fa-icon [icon]="faEdit"></fa-icon> Update Order</h5>
+                            <h6 class=""><fa-icon [icon]="faEdit"></fa-icon> Update Order</h6>
                             <div class="row mb-2">
                                 <small class="text-muted mb-2">Status</small>
                                 <div class="col-12 d-flex gap-2 flex-wrap justify-content-center">
@@ -71,17 +76,109 @@
                         <button class="btn w-100" [ngClass]="isNotified(order) ? 'btn-outline-dark' : 'btn-primary'" (click)="textCustomer(order)">
                             <fa-icon [icon]="faMessage"></fa-icon> {{ isNotified(order) ? ('Message ' + order.name) : ('Notify ' + order.name + ' order ' + order.status)}}
                         </button>      
-                        <div class="pt-3 small" *ngIf="getNotifiedStatuses(order).length > 0"  (click)="startEdit(order)">
-                            <small class="text-muted mb-2">Messages Sent</small>
-                            <div *ngFor="let item of getNotifiedStatuses(order)" class="d-flex align-items-center">
-                                <span class="text-success"><fa-icon class="text-success me-2" [icon]="faCircleCheck"></fa-icon></span>
-                                <span>{{ item.status | titlecase }}</span>
-                                <small class="text-muted ps-2">{{ item.time | date:'short' }}</small>
-                            </div>
-                        </div>           
+                        <div class="mt-3 p-2 small bg-body-tertiary border border-light-subtle rounded-3" *ngIf="getNotifiedStatuses(order).length > 0"  (click)="startEdit(order)">
+                            <small>
+                                <p class="small text-muted mb-2">Messages Sent</p>
+                                <div *ngFor="let item of getNotifiedStatuses(order)" class="d-flex align-items-center">
+                                    <span class="text-success"><fa-icon class="text-success me-2" [icon]="faCircleCheck"></fa-icon></span>
+                                    <span class="space-mono-regular">{{ item.status | titlecase }}</span>
+                                    <small class="text-muted ps-2"><small>{{ item.time | date:'short' }}</small></small>
+                                </div>
+                            </small>
+                        </div>              
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row text-center mt-5" *ngIf="completedOrders.length > 0">
+            <div class="col-12">
+                <button class="btn btn-outline-success position-relative" (click)="showCompleted = !showCompleted"><span *ngIf="!showCompleted" class="me-2 position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">{{ completedOrders.length }}</span>{{ showCompleted ? 'Hide Fulfilled Orders' : 'Show Fulfilled Orders'}}</button>
+            </div>
+        </div>
+        <div *ngIf="showCompleted && completedOrders.length > 0" class="mt-4">
+            <!-- <div class="row mb-3">
+                <div class="col-12">
+                    <h2 class="fw-light">Completed & Notified Orders</h2>
+                </div>
+            </div> -->
+            <div class="d-flex flex-column gap-3">
+                <div *ngFor="let order of completedOrders">
+                    <div class="col-12 card shadow rounded-4 border-0">
+                        <div class="card-body">
+                            <div class="pb-3 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Placed: {{ order.createdAt | date:'mediumDate' }}</small>
+                            <div>
+                                <span *ngIf="order.status === 'completed'" class="me-2" [ngClass]="getStatusClass(order.status)"><fa-icon class="me-1" [icon]="faCircleCheck"></fa-icon>{{ order.status }}</span>
+                                <small class="text-muted space-mono-regular">{{ order.id }}</small>
+                            </div>
+                        </div>
+                            <div class="row d-flex align-items-center">
+                                <div class="col-auto pe-0">
+                                    <img src="assets/chicken-party.png" class="" width="70" />
+                                </div>
+                                <div class="col">
+                                    <h1 class="m-0">{{ order.name }}</h1>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h1 class="sigmar-regular lh-1"><span>{{ order.dozenCount }} </span> <span class="fs-6">dozen {{ order.eggCondition }}</span></h1>
+                                    </div>
+                                    <h6 class="small fw-light text-muted m-0">${{ order.unitPrice }} per dozen</h6>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <span class="small fw-bold">Total: ${{ order.totalPrice }}</span><small class="payment-badge"><small><span class="badge text-bg-success payment-type">{{ order.paymentType }}</span><span class="ms-1 badge text-bg-success">PAID</span></small></small>
+                                    </div>
+                                    <div class="small text-danger mt-2" *ngIf="order.orderNotes">
+                                        <i>" {{ order.orderNotes }} "</i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button (click)="startEdit(order)" *ngIf="editingOrderId !== order.id" class="btn btn-outline-dark mt-3 w-100"><fa-icon [icon]="faEdit"></fa-icon> Update order</button> 
+                        </div>
+                        <!-- EXPANDED EDIT -->
+                        <div class="card-body bg-body-secondary py-3 border-top border-1 rounded-bottom-4" *ngIf="editingOrderId === order.id">
+                            <div class="mb-4 text-center">
+                                <h6 class=""><fa-icon [icon]="faEdit"></fa-icon> Update Order</h6>
+                                <div class="row mb-2">
+                                    <small class="text-muted mb-2">Status</small>
+                                    <div class="col-12 d-flex gap-2 flex-wrap justify-content-center">
+                                        <h3 class *ngFor="let status of statuses">
+                                            <button class="btn fw-bold" [ngClass]="selectedStatus === status ? getStatusClass(status) : 'btn-outline-secondary'" (click)="selectedStatus = status">{{ status }}</button>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <small class="text-muted mb-2">Quantity</small>
+                                    <div class="col-12 d-flex gap-2 flex-wrap justify-content-center">
+                                        <select class="form-select w-auto" [(ngModel)]="selectedQuantity">
+                                            <option *ngFor="let qty of quantityOptions" [value]="qty">
+                                            {{ qty }} dozen
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button class="btn btn-success flex-grow-1 flex-md-grow-0" (click)="saveOrder(order)"><fa-icon class="" [icon]="faCheck"></fa-icon> Save</button>
+                                <button class="btn btn-outline-dark flex-grow-1 flex-md-grow-0" (click)="cancelEdit()"><fa-icon class="" [icon]="faXmark"></fa-icon> Cancel</button>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0" *ngIf="editingOrderId !== order.id">
+                            <button class="btn w-100" [ngClass]="isNotified(order) ? 'btn-outline-dark' : 'btn-primary'" (click)="textCustomer(order)">
+                                <fa-icon [icon]="faMessage"></fa-icon> {{ isNotified(order) ? ('Message ' + order.name) : ('Notify ' + order.name + ' order ' + order.status)}}
+                            </button>      
+                            <div class="mt-3 p-2 small bg-body-tertiary border border-light-subtle rounded-3" *ngIf="getNotifiedStatuses(order).length > 0"  (click)="startEdit(order)">
+                                <small>
+                                    <p class="small text-muted mb-2">Messages Sent</p>
+                                    <div *ngFor="let item of getNotifiedStatuses(order)" class="d-flex align-items-center">
+                                        <span class="text-success"><fa-icon class="text-success me-2" [icon]="faCircleCheck"></fa-icon></span>
+                                        <span class="space-mono-regular">{{ item.status | titlecase }}</span>
+                                        <small class="text-muted ps-2"><small>{{ item.time | date:'short' }}</small></small>
+                                    </div>
+                                </small>
+                            </div>         
+                        </div>
+                    </div>
+                </div>
+        </div>
         </div>
     </div>
 </div>

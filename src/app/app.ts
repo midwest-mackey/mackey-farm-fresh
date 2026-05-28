@@ -16,7 +16,7 @@ import { AuthService } from './services/auth.service';
 })
 export class App implements OnInit {
 
-  protected readonly title = signal('Mackey Farm Fresh Eggs');
+  protected readonly title = signal('Mackey\'s Farm Fresh Eggs');
 
   hasOrders$!: Observable<boolean>;
   unitEggPrice = 0;

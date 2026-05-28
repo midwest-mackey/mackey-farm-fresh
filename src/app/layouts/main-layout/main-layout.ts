@@ -19,7 +19,7 @@ export class MainLayout {
 
   faArrowRight = faArrowRight;
 
-  protected readonly title = signal('Mackey Farm Fresh Eggs');
+  protected readonly title = signal('Mackey\'s Farm Fresh Eggs');
 
   hasOrders$!: Observable<boolean>;
   unitEggPrice = 0;

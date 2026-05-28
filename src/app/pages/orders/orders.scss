@@ -11,8 +11,12 @@ section {
 }
 .payment-badge {
     margin-top: -5px;
-    .badge {
+    .badge.payment-type {
         background-color: #1ED760 !important;
         color: black !important;
     }
+}
+.venmo-button {
+    background-color: #008CFF !important;
+    border-color: #008CFF !important;
 }

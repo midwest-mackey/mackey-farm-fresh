@@ -11,32 +11,37 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',
 })
+
 export class LoginPage {
 
   faArrowLeft = faArrowLeft;
-  username = 'midwest.mackey';
-  password = '2015Luman!';
   error = false;
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
-      username: [''],
+      email: [''],
       password: ['']
     });
   }
 
   login() {
-    const { username, password } = this.loginForm.value;
+    console.log("🔥 LOGIN CLICKED");
 
-    const success = this.auth.login(username, password);
+    const { email, password } = this.loginForm.value;
 
-    if (success) {
-      this.router.navigate(['/admin']);
-    }
+    this.auth.login(email, password).subscribe({
+      next: () => {
+        this.error = false;
+        this.router.navigate(['/admin']);
+      },
+      error: (err: any) => {
+        this.error = true;
+      }
+    });
   }
-
 }
-
-
-  

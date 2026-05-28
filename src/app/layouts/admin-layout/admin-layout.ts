@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCircleUser } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-admin-layout',
@@ -12,7 +12,7 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 export class AdminLayout {
 
   faArrowLeft = faArrowLeft;
-
+  faCircleUser = faCircleUser;
   constructor(
     private auth: AuthService,
     private router: Router

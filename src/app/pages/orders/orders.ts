@@ -6,8 +6,8 @@ import { ChangeDetectorRef } from '@angular/core';
 import { OrdersService } from '../../services/orders.service';
 import { DeviceService } from '../../services/device.service';
 
-import { faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
-
+import { faCircleCheck, faRotate, faQuoteLeft, faQuoteRight, faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faVenmoV } from '@fortawesome/free-brands-svg-icons';
 
 @Component({
   selector: 'app-orders',
@@ -17,8 +17,13 @@ import { faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
 })
 export class Orders implements OnInit, OnDestroy {
 
+  faCircleCheck = faCircleCheck;
+  faQuoteLeft = faQuoteLeft;
+  faQuoteRight = faQuoteRight;
   faPhone = faPhone;
   faMessage = faCommentSms;  
+  faVenmo = faVenmoV;
+  faRotate = faRotate;
 
   orders: any[] = [];
   newestOrder: any;
@@ -71,13 +76,39 @@ export class Orders implements OnInit, OnDestroy {
       });
   }
 
+  confirmingReorderId: string | null = null;
+  successfulReorderId: string | null = null;
+
+  showReorderConfirm(orderId: string) {
+    this.confirmingReorderId = orderId;
+  }
+
+  cancelReorder() {
+    this.confirmingReorderId = null;
+  }
+
   reorder(order: any) {
     this.ordersService.reorder(order.id).subscribe({
       next: () => {
-        this.loadOrders(); // refresh list
+        // clear confirm state
+        this.confirmingReorderId = null;
+
+        // show success state
+        this.successfulReorderId = order.id;
+
+        // refresh orders
+        this.loadOrders();
+
+        // revert after 3 sec
+        setTimeout(() => {
+          if (this.successfulReorderId === order.id) {
+            this.successfulReorderId = null;
+          }
+        }, 5000);
       },
       error: (err) => {
         console.error('Reorder failed', err);
+        this.confirmingReorderId = null;
       }
     });
   }
@@ -86,23 +117,67 @@ export class Orders implements OnInit, OnDestroy {
     return ['completed', 'cancelled'].includes(order.status);
   }
 
-  getStatusClass(status: string) {
+  canVenmo(order: any) {
+    return (
+      order.paymentType === 'venmo' &&
+      ['approved', 'modified', 'ready'].includes(order.status)
+    );
+  }
+
+  getStatusInfo(status: string) {
     switch (status) {
-      case 'requested': return 'text-bg-warning';
-      case 'approved': return 'text-bg-success approved';
-      case 'modified': return 'text-bg-danger';
-      case 'ready': return 'text-bg-success';
-      case 'completed': return 'text-bg-secondary';
-      case 'cancelled': return 'text-bg-dark';
-      default: return 'text-bg-primary';
+      case 'requested':
+        return { class: 'badge text-bg-warning', text: 'Requested' };
+      case 'approved':
+        return { class: 'badge text-bg-success', text: 'Approved' };
+      case 'modified':
+        return { class: 'badge text-bg-danger', text: 'Modified' };
+      case 'ready':
+        return { class: 'badge text-bg-success', text: 'Ready for pickup' };
+      case 'completed':
+        return { class: 'text-success', text: 'Thank you!' };
+      case 'cancelled':
+        return { class: 'badge text-bg-dark', text: 'Cancelled' };
+      default:
+        return { class: 'badge text-bg-primary', text: status };
     }
   }
+
   getSmsLink(): string {
     if (!this.newestOrder) return '';
 
     const msg = `🥚 Hey, this is ${this.newestOrder.name}, I have a question about my most recent order.`;
 
     return `sms:5155180989?body=${encodeURIComponent(msg)}`;
+  }
+
+  openVenmo(orderId: string) {
+    console.log('VENMO CLICK:', orderId);
+
+    const order = this.orders.find(o => o.id === orderId);
+
+    if (!order) {
+      console.error('Order not found in local cache');
+      return;
+    }
+
+    const username = 'smackey15';
+
+    const note = encodeURIComponent(
+      `🥚 ${order.dozenCount} dozen eggs`
+    );
+
+    const appUrl =
+      `venmo://paycharge?txn=pay&recipients=${username}` +
+      `&amount=${order.totalPrice}&note=${note}`;
+
+    const webUrl = `https://venmo.com/${username}`;
+
+    window.location.href = appUrl;
+
+    setTimeout(() => {
+      window.open(webUrl, '_blank');
+    }, 1500);
   }
   
   ngOnDestroy() {

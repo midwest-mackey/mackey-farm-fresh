@@ -1,36 +1,70 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private key = 'admin';
+  private tokenKey = 'token';
 
-  private authState = new BehaviorSubject<boolean>(this.isLoggedIn());
+  private authState = new BehaviorSubject<boolean>(this.hasToken());
   auth$ = this.authState.asObservable();
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient
+  ) {}
 
-  login(username: string, password: string): boolean {
-    const isValid = username === 'midwest.mackey' && password === '2015Luman!';
+  private hasToken(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
+  }
 
-    if (isValid) {
-      localStorage.setItem(this.key, 'true');
-      this.authState.next(true);
-      return true;
-    }
+  login(email: string, password: string) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/auth/login`,
+      { email, password }
+    ).pipe(
+      tap((res: any) => {
+        localStorage.setItem(this.tokenKey, res.token);
+        this.authState.next(true);
+      })
+    );
+  }
 
-    return false;
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
   }
 
   logout() {
-    localStorage.removeItem(this.key);
+    localStorage.removeItem(this.tokenKey);
+
     this.authState.next(false);
+
     this.router.navigate(['/login']);
   }
 
-  isLoggedIn(): boolean {
-    return localStorage.getItem(this.key) === 'true';
+  getMe() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/auth/me`
+    );
   }
+
+  updateAdminAccount(data: any) {
+    return this.http.put(
+      `${environment.apiUrl}/auth/account`,
+      data,
+      {
+        withCredentials: true
+      }
+    );
+  }
+
+  getAdmins() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/admin/admins`
+    );
+  }
+
 }
