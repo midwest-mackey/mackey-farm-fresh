@@ -1,0 +1,17 @@
+<div
+  class="availability-card rounded-3 border border-2"
+  [class.available]="available"
+  [class.unavailable]="!available"
+>
+  <div class="content">
+
+    <p
+      class="status-text"
+      [class.text-success]="available"
+      [class.text-danger]="!available"
+    >
+      {{ available ? '🥚 Eggs Available' : 'Sold Out — Order now and we\'ll notify you when we can fulfill your order' }}
+    </p>
+
+  </div>
+</div>

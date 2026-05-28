@@ -15,8 +15,10 @@ section {
     }
 }
 #content, #content .container {
-        min-height: calc(100vh - 246px);
-
+    min-height: calc(100vh - 246px);
+}
+.card {
+    outline: 5px solid rgba(255, 255, 255, 0.25);
 }
 // Media Breakpoints
 // @include media-breakpoint-down(md) {

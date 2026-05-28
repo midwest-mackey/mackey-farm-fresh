@@ -1,0 +1,18 @@
+.badge, .btn {
+    &.text-bg-secondary.muted {
+        background-color: #c6cdd3 !important;
+        color: black !important;
+    }
+}
+.card {
+    .card-footer {
+        border-top: none !important;
+    }
+}
+.payment-badge {
+    margin-top: -5px;
+    .badge.payment-type {
+        background-color: #1ED760 !important;
+        color: black !important;
+    }
+}

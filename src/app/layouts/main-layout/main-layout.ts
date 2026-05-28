@@ -4,36 +4,33 @@ import {
   OnInit,
   HostListener
 } from '@angular/core';
-import { OrdersService } from './services/orders.service';
+import { OrdersService } from '../.././services/orders.service';
 import { Observable } from 'rxjs';
-import { AuthService } from './services/auth.service';
+import { AuthService } from '../.././services/auth.service';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.html',
+  selector: 'app-main-layout',
   standalone: false,
-  styleUrl: './app.scss'
+  templateUrl: './main-layout.html',
+  styleUrl: './main-layout.scss',
 })
-export class App implements OnInit {
+export class MainLayout {
+
+  faArrowRight = faArrowRight;
 
   protected readonly title = signal('Mackey\'s Farm Fresh Eggs');
 
   hasOrders$!: Observable<boolean>;
   unitEggPrice = 0;
 
-  constructor(
-    private ordersService: OrdersService,
-    public auth: AuthService
-  ) {}
+  constructor(private ordersService: OrdersService, public auth: AuthService) {}
 
   ngOnInit() {
     this.hasOrders$ = this.ordersService.hasOrders$;
-
     this.ordersService.refreshOrderState();
-
     this.ordersService.refreshSettings();
-
-    this.ordersService.settings$.subscribe((settings) => {
+    this.ordersService.settings$.subscribe(settings => {
       if (settings?.unitEggPrice != null) {
         this.unitEggPrice = settings.unitEggPrice;
       }
@@ -48,10 +45,11 @@ export class App implements OnInit {
   }
 
   private updatePageBackground() {
-    const scrolled = window.scrollY > 150;
+    const scrolled = window.scrollY > 300;
     const color = scrolled ? '#ffffff' : '#FFC107';
 
     document.documentElement.style.backgroundColor = color;
     document.body.style.backgroundColor = color;
   }
+
 }

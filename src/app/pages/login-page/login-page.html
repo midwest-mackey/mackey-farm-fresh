@@ -1,62 +1,37 @@
-<div class="container">
-  <div class="row d-flex justify-content-center align-items-start">
 
-    <div class="card border-0 rounded-4 shadow-lg col-12 col-sm-10 col-md-8 col-lg-6 my-5 p-3 p-sm-5">
-
-      <div class="card-body">
-
-        <h1 class="text-center mb-5 display-6">Admin Login</h1>
-
-        <form [formGroup]="loginForm" (ngSubmit)="login()">
-
-          <!-- Username -->
-          <div class="form-floating mb-3">
-            <input
-              id="username"
-              type="text"
-              class="form-control"
-              placeholder=" "
-              formControlName="username"
-              [class.is-invalid]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid"
-            />
-            <label for="username">Username</label>
-
-            <div class="invalid-feedback">
-              Username is required
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div class="form-floating mb-3">
-            <input
-              id="password"
-              type="password"
-              class="form-control"
-              placeholder=" "
-              formControlName="password"
-              [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
-            />
-            <label for="password">Password</label>
-
-            <div class="invalid-feedback">
-              Password is required
-            </div>
-          </div>
-
-          <!-- Submit -->
-          <button class="btn btn-warning btn-lg w-100" type="submit">
-            Login
-          </button>
-
-          <!-- Auth error -->
-          <div *ngIf="error" class="text-danger mt-2 text-center">
-            ❌ Invalid credentials
-          </div>
-
-        </form>
-
-      </div>
+<div id="app-shell" class="container d-flex justify-content-top align-items-center">
+  <nav class="navbar bg-warning">
+    <div class="container-fluid justify-content-center">
+      <a routerLink="/">
+        <img src="assets/logo.png" alt="Logo" width="180"  class="d-inline-block align-text-center">
+      </a>
     </div>
-
+  </nav>
+  <div class="card border-0 rounded-4 shadow-lg col-12 col-sm-10 col-md-8 my-3 col-lg-4 p-4 text-center">
+    <div class="card-body">
+      <h3 class="fw-light mb-4">Admin Login</h3>
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <!-- email -->
+        <div class="form-floating mb-2">
+          <input id="email" type="text" class="form-control" placeholder=" " formControlName="email" autocapitalize="off" [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"/>
+          <label for="email">Email</label>
+          <div class="invalid-feedback">Email is required</div>
+        </div>
+        <!-- Password -->
+        <div class="form-floating mb-4">
+          <input id="password" type="password" class="form-control" placeholder=" " formControlName="password" autocapitalize="off" [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"/>
+          <label for="password">Password</label>
+          <div class="invalid-feedback">Password is required</div>
+        </div>
+        <!-- Submit -->
+          <button class="btn btn-warning btn-lg w-100" type="submit">Login</button>
+        <!-- Auth error -->
+        <div *ngIf="error" class="text-danger mt-2 text-center">Invalid credentials</div>
+      </form>
+    </div>
   </div>
+  <a routerLink="/" class="btn btn-outline-dark border-0 py-0 mt-3 mb-auto"><fa-icon class="me-2" [icon]="faArrowLeft"></fa-icon><img src="assets/chicken.png" width="40"/> storefront</a>
+  <footer class="text-center mt-auto">
+    <p class="small text-muted mb-5">Mackey's Farm Fresh Eggs™ © 2026</p>
+  </footer>
 </div>

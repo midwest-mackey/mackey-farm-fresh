@@ -1,0 +1,36 @@
+<div id="app-shell" class="bg-body">
+  <nav class="navbar bg-warning">
+    <div class="container-fluid justify-content-center">
+      <a routerLink="/">
+        <img src="assets/logo.png" alt="Logo" width="180"  class="d-inline-block align-text-center">
+      </a>
+      <div class="navbar-collapse">
+        <ul class=" nav nav-pills col gap-2 justify-content-center">
+          <li class="nav-item">
+            <a class="nav-link link-dark rounded-pill" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">eggs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link link-dark rounded-pill" routerLink="/more-items" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">more items</a>
+          </li>
+          <li class="nav-item past-orders" *ngIf="hasOrders$ | async">
+            <a class="nav-link link-dark rounded-pill" routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">🧺 orders</a>
+          </li>
+          <li class="nav-item" *ngIf="auth.auth$ | async">
+            <a routerLink="/admin" class="nav-link link-dark rounded-pill py-0" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"><img src="assets/chicken-party.png" width="40"/> admin</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+    <!-- Content -->
+  <main class="flex-grow-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-5 mt-auto">
+    <img src="assets/eggs-carton.png" width="180" class="d-inline-block align-text-center">
+    <p class="small text-muted mb-5">Mackey's Farm Fresh Eggs™ © 2026</p>
+    <a href="https://midwestmackey.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-warning midwest-mackey-button"><img src="assets/mackey-logo-yellow.png" width="20"/> midwestmackey.com</a>
+  </footer>
+</div>

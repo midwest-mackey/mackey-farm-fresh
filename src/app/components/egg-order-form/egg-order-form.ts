@@ -5,9 +5,10 @@ import {
   Validators
 } from '@angular/forms';
 
-import { OrdersService } from '../services/orders.service';
-import { DeviceService } from '../services/device.service';
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import { OrdersService } from '../../services/orders.service';
+import { DeviceService } from '../../services/device.service';
+import { faCircleCheck, faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { faVenmoV } from '@fortawesome/free-brands-svg-icons';
 
 @Component({
   selector: 'app-egg-order-form',
@@ -18,27 +19,34 @@ import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 export class EggOrderForm {
 
   faCheck = faCircleCheck;
-
+  faDollarSign = faDollarSign;
+  faVenmo = faVenmoV;
   orderForm: FormGroup;
 
   isSubmitting = false;
   submitSuccess = false;
   submitError = false;
+  showNotes = false;
 
   paymentTypes = [
     { label: 'Cash', value: 'cash' },
     { label: 'Venmo', value: 'venmo' }
   ];
+  eggConditions = [
+    { label: 'Washed', value: 'washed' },
+    { label: 'Unwashed', value: 'unwashed' }
+  ];
   pickupDates = [
     { label: 'Today', value: 'today' },
     { label: 'Tomorrow', value: 'tomorrow' },
-    { label: 'In 2 Days', value: 'in_2_days' },
+    { label: 'In 2 Days', value: 'in 2 days' },
   ];
 
-  // 👇 holds formatted display value only
   formattedPhone = '';
   submittedOrder: any = null;
   
+  available = true;
+
   constructor(
     private fb: FormBuilder,
     private ordersService: OrdersService,
@@ -48,22 +56,16 @@ export class EggOrderForm {
 
     this.orderForm = this.fb.group({
       name: ['', Validators.required],
-
-      // IMPORTANT: now stores RAW digits only
-      phoneNumber: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{10}$/)
-        ]
-      ],
-
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       paymentType: ['cash', Validators.required],
-      dozenCount: [
-        1,
-        [Validators.required, Validators.min(1)]
-      ],
+      dozenCount: [1, [Validators.required, Validators.min(1)]],
+      eggCondition: ['washed', Validators.required],
+      orderNotes: ['', Validators.maxLength(200)],
       pickupDate: ['today', Validators.required]
+    });
+
+    this.ordersService.settings$.subscribe(settings => {
+      this.available = settings?.eggsAvailable ?? true;
     });
   }
 
@@ -73,6 +75,21 @@ export class EggOrderForm {
 
   get unitEggPrice(): number {
     return this.ordersService.getUnitEggPrice();
+  }
+
+  get eggConditionHelperText(): string {
+    const value = this.orderForm.get('eggCondition')?.value;
+
+    switch (value) {
+      case 'washed':
+        return 'Sanitized and ready, just like the store. Must be stored in the refrigerator.';
+
+      case 'unwashed':
+        return 'Natural protective coating left intact. Can be stored on counter, must be washed before consumption.';
+
+      default:
+        return '';
+    }
   }
 
   // --------------------------
@@ -134,6 +151,10 @@ export class EggOrderForm {
     return `(${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
 
+  toggleNotes() {
+    this.showNotes = !this.showNotes;
+  }
+
   // --------------------------
   // 🧾 SUBMIT ORDER
   // --------------------------
@@ -169,6 +190,8 @@ export class EggOrderForm {
             phoneNumber: '',
             paymentType: 'cash',
             pickupDate: 'today',
+            eggCondition: 'washed',
+            orderNotes: '',
             dozenCount: 1
           });
 
@@ -184,4 +207,5 @@ export class EggOrderForm {
         }
       });
   }
+
 }
