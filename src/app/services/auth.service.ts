@@ -67,4 +67,17 @@ export class AuthService {
     );
   }
 
+  createAdmin(data: { email: string; password: string }) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/admin/admins`,
+      data
+    );
+  }
+
+  deleteAdmin(id: number) {
+    return this.http.delete<any>(
+      `${environment.apiUrl}/admin/admins/${id}`
+    );
+  }
+
 }
