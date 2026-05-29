@@ -76,13 +76,18 @@ export class AdminPage implements OnInit, OnDestroy {
 
   showCompleted = false;
 
-  get activeOrders() {
-    return this.orders.filter(o => o.status !== 'completed' || !this.isNotified(o));
-  }
+get activeOrders() {
+  return this.orders.filter(
+    o => (o.status !== 'completed' || o.status !== 'cancelled') && !this.isNotified(o)
+  );
+}
 
-  get completedOrders() {
-    return this.orders.filter(o => o.status === 'completed' && this.isNotified(o));
-  }
+get completedOrders() {
+  return this.orders.filter(
+    o =>
+      o.status === 'completed' && this.isNotified(o) || o.status === 'cancelled'
+  );
+}
 
   // -------------------------
   // STATUS UI

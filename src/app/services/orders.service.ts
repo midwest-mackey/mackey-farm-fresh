@@ -128,6 +128,15 @@ export class OrdersService {
     );
   }
 
+  cancelOrder(orderId: number) {
+    const deviceId = this.deviceService.getDeviceId();
+
+    return this.http.post(
+      `${this.apiUrl}/orders/cancel/${orderId}`,
+      { deviceId }
+    );
+  }
+
   refreshOrderState() {
     const deviceId = this.deviceService.getDeviceId();
 
