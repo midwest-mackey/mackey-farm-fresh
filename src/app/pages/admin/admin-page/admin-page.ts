@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
 import { OrdersService } from '../../../services/orders.service';
-import { faCheck, faCircleCheck, faQuoteLeft, faQuoteRight, faEdit, faXmark, faCommentSms } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleCheck, faQuoteLeft, faQuoteRight, faEdit, faXmark, faCommentSms, faInbox } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-admin-page',
@@ -20,6 +20,7 @@ export class AdminPage implements OnInit, OnDestroy {
   faCircleCheck = faCircleCheck;
   faXmark = faXmark;
   faMessage = faCommentSms;  
+  faInbox = faInbox;
   
 
   orders: any[] = [];
@@ -76,12 +77,38 @@ export class AdminPage implements OnInit, OnDestroy {
 
   showCompleted = false;
 
+  isStatusNotified(order: any, status: string): boolean {
+    return !!order[`${status}NotifiedAt`];
+  }
+
   get activeOrders() {
-    return this.orders.filter(o => o.status !== 'completed' || !this.isNotified(o));
+    const finalStates = ['completed', 'cancelled'];
+
+    return this.orders.filter(o => {
+      if (o.status === 'completed') {
+        return !this.isStatusNotified(o, 'completed');
+      }
+
+      if (o.status === 'cancelled') {
+        return !this.isStatusNotified(o, 'cancelled');
+      }
+
+      return true;
+    });
   }
 
   get completedOrders() {
-    return this.orders.filter(o => o.status === 'completed' && this.isNotified(o));
+    return this.orders.filter(o => {
+      if (o.status === 'completed') {
+        return this.isStatusNotified(o, 'completed');
+      }
+
+      if (o.status === 'cancelled') {
+        return this.isStatusNotified(o, 'cancelled');
+      }
+
+      return false;
+    });
   }
 
   // -------------------------
@@ -146,9 +173,13 @@ export class AdminPage implements OnInit, OnDestroy {
   }
 
   getCustomerMessage(order: any, status: string) {
+    const BASE_URL = 'https://eggs.midwestmackey.com';
+
     switch (status) {
       case 'requested':
-        return `🥚 Hey ${order.name}! Your request for ${order.dozenCount} dozen eggs has been received!`;
+        return `🥚 Hey ${order.name}! Your request for ${order.dozenCount} dozen eggs has been received!
+        
+        👉 Check status: ${BASE_URL}/?ref=message&status=${order.status}`;
 
       case 'approved':
         return `🎉 ${order.name}! We have your ${order.dozenCount} dozen eggs and we're getting them ready.`;
@@ -160,10 +191,14 @@ export class AdminPage implements OnInit, OnDestroy {
         return `🎉 ${order.name}, your ${order.dozenCount} dozen egg order is ready for pickup, your total is $${order.totalPrice}, what time ${order.pickupDate} works for you to pickup?`;
 
       case 'completed':
-        return `🐔 Your order is complete! We appreciate your support of Mackey's Farm Fresh Eggs, we look forward to your next order!`;
+        return `🐔 Your order is complete! We appreciate your support of Mackey's Farm Fresh Eggs!
+        
+👉 Get your next order here: ${BASE_URL}/?ref=message&status=${order.status}`;
 
       case 'cancelled':
-        return `🐔 Hey ${order.name}, unfortunately we aren't able to fulfill your order at this time, we will reach out with additional details.`;
+        return `🐔 Hey ${order.name}, unfortunately we aren't able to fulfill your order at this time, we will reach out with additional details.
+        
+👉 Reorder here: ${BASE_URL}/orders/?ref=message&status=${order.status}`;
 
       default:
         return '';

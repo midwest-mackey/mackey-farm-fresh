@@ -6,7 +6,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { OrdersService } from '../../services/orders.service';
 import { DeviceService } from '../../services/device.service';
 
-import { faCircleCheck, faRotate, faQuoteLeft, faQuoteRight, faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faCircleXmark, faRotate, faQuoteLeft, faQuoteRight, faCommentSms, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { faVenmoV } from '@fortawesome/free-brands-svg-icons';
 
 @Component({
@@ -18,6 +18,7 @@ import { faVenmoV } from '@fortawesome/free-brands-svg-icons';
 export class Orders implements OnInit, OnDestroy {
 
   faCircleCheck = faCircleCheck;
+  faCircleXmark = faCircleXmark;
   faQuoteLeft = faQuoteLeft;
   faQuoteRight = faQuoteRight;
   faPhone = faPhone;
@@ -26,6 +27,7 @@ export class Orders implements OnInit, OnDestroy {
   faRotate = faRotate;
 
   orders: any[] = [];
+  orderCount = 0;
   newestOrder: any;
   loading = true;
 
@@ -64,6 +66,7 @@ export class Orders implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.orders = [...(data ?? [])];
+          this.orderCount = this.orders.length;
           this.newestOrder = this.orders[0] ?? null;
           this.loading = false;
           this.cdr.detectChanges();
@@ -117,6 +120,35 @@ export class Orders implements OnInit, OnDestroy {
     return ['completed', 'cancelled'].includes(order.status);
   }
 
+  confirmingCancelId: number | null = null;
+  successfulCancelId: number | null = null;
+  
+  showCancelConfirm(orderId: number) {
+    this.confirmingCancelId = orderId;
+  }
+
+  cancelCancel() {
+    this.confirmingCancelId = null;
+  }
+
+  cancelOrder(order: any) {
+    this.ordersService.cancelOrder(order.id).subscribe({
+      next: () => {
+        this.confirmingCancelId = null;
+        this.successfulCancelId = order.id;
+
+        this.loadOrders();
+
+        setTimeout(() => {
+          this.successfulCancelId = null;
+        }, 5000);
+      },
+      error: (err) => {
+        console.error('Cancel failed', err);
+      }
+    });
+  }
+
   canVenmo(order: any) {
     return (
       order.paymentType === 'venmo' &&
@@ -135,9 +167,9 @@ export class Orders implements OnInit, OnDestroy {
       case 'ready':
         return { class: 'badge text-bg-success', text: 'Ready for pickup' };
       case 'completed':
-        return { class: 'text-success', text: 'Thank you!' };
+        return { class: 'text-success small', text: 'Thank you, Enjoy!' };
       case 'cancelled':
-        return { class: 'badge text-bg-dark', text: 'Cancelled' };
+        return { class: 'text-dark small', text: 'Bummer, order cancelled' };
       default:
         return { class: 'badge text-bg-primary', text: status };
     }

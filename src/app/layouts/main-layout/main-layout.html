@@ -18,12 +18,16 @@
           <li class="nav-item" *ngIf="auth.auth$ | async">
             <a routerLink="/admin" class="nav-link link-dark rounded-pill py-0" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"><img src="assets/chicken-party.png" width="40"/> admin</a>
           </li>
+          <li class="" *ngIf="auth.auth$ | async">
+            <a (click)="logout()" class="btn btn-outline-dark position-absolute top-0 end-0 m-2">Logout</a>
+          </li>
         </ul>
       </div>
+      <a *ngIf="!(auth.auth$ | async)" routerLink="/login" class="btn btn-outline-light border-0 position-absolute top-0 end-0 m-2" id="login-button"><fa-icon [icon]="faLogin"></fa-icon></a>
     </div>
   </nav>
     <!-- Content -->
-  <main class="flex-grow-1">
+  <main class="flex-grow-1 min-vh-100">
     <router-outlet></router-outlet>
   </main>
 

@@ -1,62 +1,73 @@
 <section id="background" class="container-fluid position-absolute bg-warning overflow-hidden">
   <div class="container">
-    <div class="row py-5">
+    <div class="row pt-5 mb-2">
       <div class="col-12">
         <h1 class="display-6">Your Orders</h1>
         <small class="text-body-tertiary">Account: {{ deviceId }}</small>
-      </div>
-    </div>
-    <div class="row">
-      <div *ngIf="loading || orders.length === 0" class="col-12 text-center my-5">
-        <p *ngIf="loading">Loading...</p>
-        <p *ngIf="!loading && orders.length === 0" class="text-center my-5">No orders yet</p>
+        <h5 class="fw-light mt-3 p-3 rounded-2" *ngIf="!loading && orders.length !== 0">
+          {{
+            orderCount === 1
+              ? '👋 Hey ' + newestOrder?.name + ', thank you for your order!'
+              : '👋 Hey ' + newestOrder?.name + ', thank you for ' + orderCount + ' orders!'
+          }}
+        </h5>
+        <div *ngIf="!loading && orders.length === 0" class="text-center mt-5 py-3">
+          <img src="assets/chicken.png" width="120" />
+          <h2 class="mt-3 sigmar-regular">Bummer...</h2>
+          <p class="small text-muted">Looks like you haven't placed any orders yet</p>
+          <button routerLink="/" class="btn btn-primary rounded-pill">Place an Order</button>
+        </div>
       </div>
     </div>
   </div>
 </section>
 <div class="container-fluid">
   <div class="container">
-  <div class="row py-5">
+  <div class="row pt-5 mb-2">
     <div class="col-12">
       <h1 class="display-6">Your Orders</h1>
       <small class="text-body-tertiary">Account: {{ deviceId }}</small>
+        <h5 class="fw-light mt-3 p-3 rounded-2" *ngIf="!loading && orders.length !== 0">
+          {{
+            orderCount === 1
+              ? '👋 Hey ' + newestOrder?.name + ', thank you for your order!'
+              : '👋 Hey ' + newestOrder?.name + ', thank you for ' + orderCount + ' orders!'
+          }}
+        </h5>
+        <div *ngIf="!loading && orders.length === 0" class="text-center mt-5 py-3">
+          <img src="assets/chicken.png" width="120" />
+          <h2 class="mt-3 sigmar-regular">Bummer...</h2>
+          <p class="text-muted">Looks like you haven't placed any orders yet</p>
+          <button routerLink="/" class="btn btn-primary rounded-pill">Place an Order</button>
+        </div>
     </div>
   </div>
-  <div class="row">
-    <div *ngIf="loading || orders.length === 0" class="col-12 text-center my-5">
-      <p *ngIf="loading">Loading...</p>
-      <p *ngIf="!loading && orders.length === 0" class="text-center my-5">No orders yet</p>
-    </div>
-  </div>
+ 
   
-  <div *ngIf="!loading && orders.length > 0" class="d-flex flex-column gap-3">
+  <div *ngIf="!loading && orderCount > 0" class="d-flex flex-column gap-3">
     <div *ngFor="let order of orders" class="">
       <div class="col-12 card shadow rounded-4 border-0">
           <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2" *ngIf="canReorder(order)">
-              <span class="text-success"><fa-icon *ngIf="order.status === 'completed'" class="me-1" [icon]="faCircleCheck"></fa-icon>{{ getStatusInfo(order.status).text }}</span>
-              
-              <div *ngIf="successfulReorderId === order.id; else reorderState">
-                <div class="text-success small p-1">
+            
+            <div class="d-flex justify-content-end align-items-center mb-2" *ngIf="canReorder(order)">
+              <span *ngIf="confirmingReorderId !== order.id && successfulReorderId !== order.id" [ngClass]="getStatusInfo(order.status).class" class="me-auto"><fa-icon *ngIf="order.status === 'completed'" class="me-1" [icon]="faCircleCheck"></fa-icon><fa-icon *ngIf="order.status === 'cancelled'" class="me-1" [icon]="faCircleXmark"></fa-icon>{{ getStatusInfo(order.status).text }}</span>
+              <div *ngIf="successfulReorderId === order.id; else reorderState" class="flex-grow-1 flex-md-grow-0">
+                <div class="text-success small p-1 text-center fst-italic">
                   <fa-icon class="me-1" [icon]="faCircleCheck"></fa-icon>Request sent!
                 </div>
               </div>
               <ng-template #reorderState>
                 <div *ngIf="confirmingReorderId !== order.id; else reorderConfirm">
-                  <button class="btn btn-sm btn-outline-primary border-0" (click)="showReorderConfirm(order.id)"><fa-icon class="me-1" [icon]="faRotate"></fa-icon>Request Again</button>
+                  <button class="btn btn-sm btn-outline-primary border-white rounded-pill" (click)="showReorderConfirm(order.id)"><fa-icon class="me-1" [icon]="faRotate"></fa-icon>Request Again</button>
                 </div>
                 <ng-template #reorderConfirm>
-                  <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-success border-0" (click)="reorder(order)">Confirm</button>
-                    <button class="btn btn-sm btn-outline-secondary border-0" (click)="cancelReorder()">Cancel</button>
+                  <div class="d-flex gap-2 flex-grow-1 flex-md-grow-0">
+                    <button class="btn btn-sm btn-success rounded-pill flex-grow-1 flex-md-grow-0" (click)="reorder(order)">Confirm</button>
+                    <button class="btn btn-sm btn-secondary  rounded-pill flex-grow-1 flex-md-grow-0" (click)="cancelReorder()">Cancel</button>
                   </div>
                 </ng-template>
               </ng-template>
               
-              
-              
-    
-          
             </div>
             <div class="row d-flex align-items-center">
               <div class="col-auto pe-0">
@@ -66,7 +77,7 @@
               <div class="col">
                 <small class="text-muted">{{ order.createdAt | date:'mediumDate' }}</small>
                 <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="sigmar-regular lh-1"><span>{{ order.dozenCount }} </span> <span class="fs-6">dozen {{ order.eggCondition }}</span></h1><span *ngIf="order.status != 'completed'" [ngClass]="getStatusInfo(order.status).class">{{ getStatusInfo(order.status).text }}</span>
+                    <h1 class="sigmar-regular lh-1"><span>{{ order.dozenCount }} </span> <span class="fs-6">dozen {{ order.eggCondition }}</span></h1><span *ngIf="order.status != 'completed' && order.status != 'cancelled'" [ngClass]="getStatusInfo(order.status).class"><fa-icon *ngIf="order.status === 'completed'" class="me-1" [icon]="faCircleCheck"></fa-icon><fa-icon *ngIf="order.status === 'cancelled'" class="me-1" [icon]="faCircleXmark"></fa-icon>{{ getStatusInfo(order.status).text }}</span>
                 </div>
                 <div class="d-flex gap-1 align-items-center">
                     <span class="small text-muted">Total: ${{ order.totalPrice }}</span><small class="payment-badge"><small><span class="badge text-bg-success payment-type">{{ order.paymentType }}</span><span *ngIf="order.status === 'completed'" class="ms-1 badge text-bg-success">PAID</span></small></small>
@@ -76,10 +87,33 @@
                 </div>
               </div>
             </div>
-            <div class="row text-end mt-2" *ngIf="canVenmo(order)">
-              <div class="ms-auto col-12 col-md-auto">
-                <button (click)="openVenmo(order.id)" class="w-100 btn btn-sm btn-primary venmo-button rounded-pill"><fa-icon class="me-1" [icon]="faVenmo"></fa-icon>Pay ${{ order.totalPrice }} now</button>
-              </div>
+            
+            <div *ngIf="order.status !== 'completed' && order.status !== 'cancelled' || successfulCancelId === order.id"class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+              <button *ngIf="canVenmo(order)" (click)="openVenmo(order.id)" class="btn btn-sm btn-primary venmo-button rounded-pill"><fa-icon class="me-1" [icon]="faVenmo"></fa-icon>Pay ${{ order.totalPrice }} now</button>
+              <!-- <button *ngIf="order.status !== 'completed' && order.status !== 'cancelled'" class=" btn btn-sm btn-outline-danger border-0 rounded-pill">Cancel Order</button> -->
+              <ng-container>
+                <div class="text-center" *ngIf="successfulCancelId === order.id; else cancelState">
+                  <div class="text-success small p-1 fst-italic">
+                    <fa-icon class="me-1" [icon]="faCircleCheck"></fa-icon>Order cancelled
+                  </div>
+                </div>
+
+                <ng-template #cancelState>
+                  <div *ngIf="order.status !== 'completed' && order.status !== 'cancelled'" class="">
+                  <div class="text-center" *ngIf="confirmingCancelId !== order.id; else cancelConfirm">
+                    <button class="w-100 btn btn-sm btn-outline-danger border-white rounded-pill" (click)="showCancelConfirm(order.id)">Cancel Order</button>
+                  </div>
+                  </div>
+
+                  <ng-template #cancelConfirm>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-sm btn-danger rounded-pill flex-grow-1 flex-md-grow-0" (click)="cancelOrder(order)">Confirm</button>
+                      <button class="btn btn-sm btn-secondary rounded-pill flex-grow-1 flex-md-grow-0" (click)="cancelCancel()">Nevermind</button>
+                    </div>
+                  </ng-template>
+                </ng-template>
+              </ng-container>
+
             </div>
           </div>
       </div>

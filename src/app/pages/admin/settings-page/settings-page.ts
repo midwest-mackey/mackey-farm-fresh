@@ -1,9 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Subscription } from 'rxjs';
+
 import { AuthService } from '../../../services/auth.service';
 import { OrdersService, AppSettings } from '../../../services/orders.service';
-import { faCheck, faDollarSign, faXmark, faCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { Subscription } from 'rxjs';
+import { PushService } from '../../../services/push.service';
+
+import {
+  faCheck,
+  faDollarSign,
+  faXmark,
+  faCirclePlus,
+  faTrash,
+  faShop,
+  faUsers,
+  faUserPen,
+  faBell
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-settings-page',
@@ -13,33 +26,45 @@ import { Subscription } from 'rxjs';
 })
 export class SettingsPage implements OnInit, OnDestroy {
 
+  // Icons
   faCheck = faCheck;
   faXmark = faXmark;
   faDollarSign = faDollarSign;
   faCirclePlus = faCirclePlus;
   faTrash = faTrash;
+  faShop = faShop;
+  faUsers = faUsers;
+  faUserPen = faUserPen;
+  faBell = faBell;
 
+  // State
   settings: AppSettings = {
     eggsAvailable: true,
     unitEggPrice: 5
   };
 
+  pushEnabled = false;
+
+  pushState = {
+    subscribed: false,
+    permission: Notification.permission,
+    loading: false
+  };
+
   saving = false;
-
-  // ✅ FIX: initialize as empty array for stable rendering
   admins: any[] = [];
-
+  showAddAdmin = false;
   accountForm: FormGroup;
   addAdminForm: FormGroup;
-
-  showAddAdmin = false;
 
   private sub = new Subscription();
 
   constructor(
     private ordersService: OrdersService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private pushService: PushService,
+    private cd: ChangeDetectorRef
   ) {
 
     this.accountForm = this.fb.group({
@@ -54,72 +79,114 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {
+  // INIT
+  async ngOnInit() {
 
     this.sub.add(
-      this.ordersService.settings$.subscribe(settings => {
-        if (settings) {
-          this.settings = { ...settings };
-        }
+      this.ordersService.settings$.subscribe(s => {
+        if (s) this.settings = { ...s };
       })
     );
 
     this.sub.add(
-      this.authService.getMe().subscribe({
-        next: (res) => {
-          this.accountForm.patchValue({
-            email: res.user.email
-          });
-        },
-        error: (err) => {
-          console.error('Failed to load user', err);
-        }
+      this.authService.getMe().subscribe(res => {
+        this.accountForm.patchValue({
+          email: res.user.email
+        });
       })
     );
 
     this.ordersService.refreshSettings();
     this.loadAdmins();
+
+    // wait for SW registration
+    setTimeout(() => {
+      this.refreshPushStatus();
+    }, 300);
   }
 
-  saveSettings() {
-    this.saving = true;
+  // PUSH STATE
+  async refreshPushStatus() {
+    const status = await this.pushService.getStatus();
 
-    this.ordersService.updateSettings(this.settings).subscribe({
-      next: () => {
-        this.saving = false;
-        this.ordersService.refreshSettings();
-      },
-      error: (err) => {
-        console.error(err);
-        this.saving = false;
+    this.pushState.permission = status.permission;
+    this.pushState.subscribed = status.subscribed;
+
+    this.cd.detectChanges(); // IMPORTANT
+  }
+
+  // ENABLE PUSH NOTIFICATIONS
+  async enablePush() {
+    try {
+      this.pushState.loading = true;
+
+      const permission = await Notification.requestPermission();
+
+      if (permission !== 'granted') {
+        this.pushState.subscribed = false;
+        this.pushState.loading = false;
+        this.cd.detectChanges();
+        return;
       }
-    });
+
+      const publicKey = await this.pushService.loadPublicKey();
+      const reg = await navigator.serviceWorker.ready;
+
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: this.urlBase64ToUint8Array(publicKey)
+      });
+
+      await this.pushService.saveSubscription(sub);
+
+      await this.refreshPushStatus();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.pushState.loading = false;
+      this.cd.detectChanges();
+    }
+  }
+
+  // DISABLE PUSH NOTIFICATIONS
+  async disablePush() {
+    try {
+      this.pushState.loading = true;
+
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+
+      if (sub) {
+        await sub.unsubscribe();
+      }
+
+      await this.refreshPushStatus();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.pushState.loading = false;
+      this.cd.detectChanges();
+    }
   }
 
   updateAccount() {
     if (this.accountForm.invalid) return;
 
     this.authService.updateAdminAccount(this.accountForm.value).subscribe({
-      next: () => {
-        alert('Account updated successfully');
-      },
-      error: (err) => {
-        console.error(err);
-        alert(err?.error?.error || 'Update failed');
-      }
+      next: () => alert('Account updated successfully'),
+      error: err => alert(err?.error?.error || 'Update failed')
     });
   }
 
+  // ADMINS
   loadAdmins() {
     this.authService.getAdmins().subscribe({
-      next: (res) => {
-        // 🔥 IMPORTANT: new reference forces Angular update
+      next: res => {
         this.admins = [...res.admins];
-        console.log("ADMIN ARRAY:", this.admins);
       },
-      error: (err) => {
-        console.error('Failed to load admins', err);
-      }
+      error: err => console.error(err)
     });
   }
 
@@ -132,36 +199,37 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.addAdminForm.reset();
         this.loadAdmins();
       },
-      error: (err) => {
-        console.error(err);
-        alert(err?.error?.error || 'Failed to create admin');
-      }
+      error: err => console.error(err)
     });
   }
 
   deleteAdmin(admin: any) {
-    if (confirm(`Delete admin ${admin.email}? This cannot be undone.`)) {
+    if (!confirm(`Delete admin ${admin.email}?`)) return;
 
-      // safety lock: self-delete prevention (frontend)
-      const currentUser = this.accountForm.value;
-
-      if (currentUser?.email === admin.email) {
-        alert("You cannot delete your own account.");
-        return;
-      }
-
-      this.authService.deleteAdmin(admin.id).subscribe({
-        next: () => {
-          this.loadAdmins();
-        },
-        error: (err) => {
-          console.error(err);
-          alert(err?.error?.error || "Failed to delete admin");
-        }
-      });
-    }
+    this.authService.deleteAdmin(admin.id).subscribe({
+      next: () => this.loadAdmins(),
+      error: err => console.error(err)
+    });
   }
 
+  // UTIL
+  private urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+
+    return outputArray;
+  }
+
+  // CLEANUP
   ngOnDestroy() {
     this.sub.unsubscribe();
   }

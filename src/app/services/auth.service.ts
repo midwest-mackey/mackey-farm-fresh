@@ -3,6 +3,13 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { PushService } from './push.service';
+
+interface User {
+  id: number;
+  email: string;
+  role: 'admin' | 'user';
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,9 +19,13 @@ export class AuthService {
   private authState = new BehaviorSubject<boolean>(this.hasToken());
   auth$ = this.authState.asObservable();
 
+  private userSubject = new BehaviorSubject<User | null>(null);
+  user$ = this.userSubject.asObservable();
+
   constructor(
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private pushService: PushService
   ) {}
 
   private hasToken(): boolean {
@@ -28,10 +39,35 @@ export class AuthService {
     ).pipe(
       tap((res: any) => {
         localStorage.setItem(this.tokenKey, res.token);
+
         this.authState.next(true);
+        this.userSubject.next(res.user);
+
+        this.initAdminFeatures(res.user);
       })
     );
   }
+
+  loadUser() {
+    return this.getMe().pipe(
+      tap(user => {
+        this.userSubject.next(user);
+        this.authState.next(true);
+
+        this.initAdminFeatures(user);
+      })
+    );
+  }
+
+  private initAdminFeatures(user: User) {
+    if (user?.role === 'admin') {
+      this.pushService.loadPublicKey()
+        .then(() => {
+          console.log('🔔 Admin push enabled');
+        });
+    }
+  }
+
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
