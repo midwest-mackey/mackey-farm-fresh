@@ -171,6 +171,23 @@ export class SettingsPage implements OnInit, OnDestroy {
     }
   }
 
+  // SAVE SETTINGS
+  saveSettings() {
+    this.saving = true;
+
+    this.ordersService.updateSettings(this.settings).subscribe({
+      next: () => {
+        this.saving = false;
+        this.ordersService.refreshSettings();
+      },
+      error: (err) => {
+        console.error(err);
+        this.saving = false;
+      }
+    });
+  }
+  
+  // UPDATE ACCOUNT
   updateAccount() {
     if (this.accountForm.invalid) return;
 
@@ -180,7 +197,7 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
   }
 
-  // ADMINS
+  // GET ADMINS
   loadAdmins() {
     this.authService.getAdmins().subscribe({
       next: res => {
@@ -190,6 +207,7 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
   }
 
+  // ADD ADMIN
   addAdmin() {
     if (this.addAdminForm.invalid) return;
 
@@ -203,6 +221,7 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
   }
 
+  // DELETE ADMIN
   deleteAdmin(admin: any) {
     if (!confirm(`Delete admin ${admin.email}?`)) return;
 
