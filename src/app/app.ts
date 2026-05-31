@@ -32,6 +32,8 @@ export class App implements OnInit {
     this.ordersService.refreshOrderState();
 
     this.ordersService.refreshSettings();
+    
+    this.auth.loadUser().subscribe();
 
     this.ordersService.settings$.subscribe((settings) => {
       if (settings?.unitEggPrice != null) {

@@ -6,8 +6,9 @@ import {
 } from '@angular/core';
 import { OrdersService } from '../.././services/orders.service';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 import { AuthService } from '../.././services/auth.service';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faArrowRightToBracket, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-main-layout',
@@ -18,13 +19,16 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 export class MainLayout {
 
   faArrowRight = faArrowRight;
+  faLogin = faArrowRightToBracket;
+  faLogout = faArrowRightFromBracket;
+
 
   protected readonly title = signal('Mackey\'s Farm Fresh Eggs');
 
   hasOrders$!: Observable<boolean>;
   unitEggPrice = 0;
 
-  constructor(private ordersService: OrdersService, public auth: AuthService) {}
+  constructor(private ordersService: OrdersService, public auth: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.hasOrders$ = this.ordersService.hasOrders$;
@@ -50,6 +54,11 @@ export class MainLayout {
 
     document.documentElement.style.backgroundColor = color;
     document.body.style.backgroundColor = color;
+  }
+
+   logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 
 }

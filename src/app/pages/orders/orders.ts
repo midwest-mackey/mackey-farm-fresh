@@ -27,6 +27,7 @@ export class Orders implements OnInit, OnDestroy {
   faRotate = faRotate;
 
   orders: any[] = [];
+  orderCount = 0;
   newestOrder: any;
   loading = true;
 
@@ -65,6 +66,7 @@ export class Orders implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.orders = [...(data ?? [])];
+          this.orderCount = this.orders.length;
           this.newestOrder = this.orders[0] ?? null;
           this.loading = false;
           this.cdr.detectChanges();
@@ -165,7 +167,7 @@ export class Orders implements OnInit, OnDestroy {
       case 'ready':
         return { class: 'badge text-bg-success', text: 'Ready for pickup' };
       case 'completed':
-        return { class: 'text-success small', text: 'Thank you!' };
+        return { class: 'text-success small', text: 'Thank you, Enjoy!' };
       case 'cancelled':
         return { class: 'text-dark small', text: 'Bummer, order cancelled' };
       default:
