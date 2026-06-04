@@ -9,7 +9,6 @@ import { PushService } from '../../../services/push.service';
 import {
   faCheck,
   faDollarSign,
-  faXmark,
   faCirclePlus,
   faTrash,
   faShop,
@@ -20,15 +19,13 @@ import {
 
 @Component({
   selector: 'app-settings-page',
-  standalone: false,
   templateUrl: './settings-page.html',
   styleUrl: './settings-page.scss'
 })
 export class SettingsPage implements OnInit, OnDestroy {
 
-  // Icons
+  // icons
   faCheck = faCheck;
-  faXmark = faXmark;
   faDollarSign = faDollarSign;
   faCirclePlus = faCirclePlus;
   faTrash = faTrash;
@@ -37,23 +34,27 @@ export class SettingsPage implements OnInit, OnDestroy {
   faUserPen = faUserPen;
   faBell = faBell;
 
-  // State
+  // state
   settings: AppSettings = {
     eggsAvailable: true,
     unitEggPrice: 5
   };
 
-  pushEnabled = false;
+  admins: any[] = [];
+  showAddAdmin = false;
+  saving = false;
 
   pushState = {
     subscribed: false,
-    permission: Notification.permission,
+    permission: 'default',
     loading: false
   };
 
-  saving = false;
-  admins: any[] = [];
-  showAddAdmin = false;
+  userNotifications = {
+    smsEnabled: false,
+    smsPhoneNumber: ''
+  };
+
   accountForm: FormGroup;
   addAdminForm: FormGroup;
 
@@ -61,9 +62,9 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   constructor(
     private ordersService: OrdersService,
-    private fb: FormBuilder,
     private authService: AuthService,
     private pushService: PushService,
+    private fb: FormBuilder,
     private cd: ChangeDetectorRef
   ) {
 
@@ -74,13 +75,12 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
 
     this.addAdminForm = this.fb.group({
-      email: this.fb.nonNullable.control(''),
-      password: this.fb.nonNullable.control('')
+      email: [''],
+      password: ['']
     });
   }
 
-  // INIT
-  async ngOnInit() {
+  ngOnInit() {
 
     this.sub.add(
       this.ordersService.settings$.subscribe(s => {
@@ -88,90 +88,97 @@ export class SettingsPage implements OnInit, OnDestroy {
       })
     );
 
-    this.sub.add(
-      this.authService.getMe().subscribe(res => {
-        this.accountForm.patchValue({
-          email: res.user.email
-        });
-      })
-    );
-
-    this.ordersService.refreshSettings();
+    this.loadUser();
     this.loadAdmins();
 
-    // wait for SW registration
-    setTimeout(() => {
-      this.refreshPushStatus();
-    }, 300);
+    this.ordersService.refreshSettings();
+
+    setTimeout(() => this.refreshPushStatus(), 300);
   }
 
-  // PUSH STATE
+  // ---------------- USER ----------------
+
+  loadUser() {
+    this.authService.getMe().subscribe({
+      next: res => {
+        const user = res.user;
+
+        this.accountForm.patchValue({
+          email: user.email
+        });
+
+        this.userNotifications = {
+          smsEnabled: !!user.smsEnabled,
+          smsPhoneNumber: user.smsPhoneNumber || ''
+        };
+
+        this.pushState.subscribed = !!user.pushEnabled;
+      }
+    });
+  }
+
+  // ---------------- PUSH ----------------
+
   async refreshPushStatus() {
     const status = await this.pushService.getStatus();
 
     this.pushState.permission = status.permission;
     this.pushState.subscribed = status.subscribed;
 
-    this.cd.detectChanges(); // IMPORTANT
+    this.cd.detectChanges();
   }
 
-  // ENABLE PUSH NOTIFICATIONS
+  async onPushToggle(event: any) {
+    if (event.target.checked) {
+      await this.enablePush();
+    } else {
+      await this.disablePush();
+    }
+  }
+
   async enablePush() {
+    this.pushState.loading = true;
+
     try {
-      this.pushState.loading = true;
-
       const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
 
-      if (permission !== 'granted') {
-        this.pushState.subscribed = false;
-        this.pushState.loading = false;
-        this.cd.detectChanges();
-        return;
-      }
-
-      const publicKey = await this.pushService.loadPublicKey();
+      const key = await this.pushService.loadPublicKey();
       const reg = await navigator.serviceWorker.ready;
 
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(publicKey)
+        applicationServerKey: this.urlBase64ToUint8Array(key)
       });
 
       await this.pushService.saveSubscription(sub);
-
       await this.refreshPushStatus();
 
-    } catch (err) {
-      console.error(err);
     } finally {
       this.pushState.loading = false;
       this.cd.detectChanges();
     }
   }
 
-  // DISABLE PUSH NOTIFICATIONS
   async disablePush() {
-    try {
-      this.pushState.loading = true;
+    this.pushState.loading = true;
 
+    try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
 
-      if (sub) {
-        await sub.unsubscribe();
-      }
+      if (sub) await sub.unsubscribe();
 
       await this.refreshPushStatus();
 
-    } catch (err) {
-      console.error(err);
     } finally {
       this.pushState.loading = false;
       this.cd.detectChanges();
     }
   }
 
-  // SAVE SETTINGS
+  // ---------------- SETTINGS ----------------
+
   saveSettings() {
     this.saving = true;
 
@@ -180,34 +187,42 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.saving = false;
         this.ordersService.refreshSettings();
       },
-      error: (err) => {
+      error: err => {
         console.error(err);
         this.saving = false;
       }
     });
   }
-  
-  // UPDATE ACCOUNT
-  updateAccount() {
-    if (this.accountForm.invalid) return;
 
-    this.authService.updateAdminAccount(this.accountForm.value).subscribe({
-      next: () => alert('Account updated successfully'),
-      error: err => alert(err?.error?.error || 'Update failed')
+  // ---------------- NOTIFICATIONS ----------------
+
+  updateNotifications() {
+    const payload = {
+      smsEnabled: this.userNotifications.smsEnabled,
+      smsPhoneNumber: this.userNotifications.smsPhoneNumber,
+      pushEnabled: this.pushState.subscribed
+    };
+
+    this.authService.updateNotificationPreferences(payload).subscribe({
+      next: () => {
+        this.loadUser(); // 🔥 re-sync truth from server
+        alert('Preferences updated');
+      },
+      error: err => {
+        alert(err?.error?.error || 'Update failed');
+      }
     });
   }
 
-  // GET ADMINS
+  // ---------------- ADMINS ----------------
+
   loadAdmins() {
     this.authService.getAdmins().subscribe({
-      next: res => {
-        this.admins = [...res.admins];
-      },
+      next: res => this.admins = res.admins,
       error: err => console.error(err)
     });
   }
 
-  // ADD ADMIN
   addAdmin() {
     if (this.addAdminForm.invalid) return;
 
@@ -216,39 +231,34 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.showAddAdmin = false;
         this.addAdminForm.reset();
         this.loadAdmins();
-      },
-      error: err => console.error(err)
+      }
     });
   }
 
-  // DELETE ADMIN
   deleteAdmin(admin: any) {
-    if (!confirm(`Delete admin ${admin.email}?`)) return;
+    if (!confirm(`Delete ${admin.email}?`)) return;
 
     this.authService.deleteAdmin(admin.id).subscribe({
-      next: () => this.loadAdmins(),
-      error: err => console.error(err)
+      next: () => this.loadAdmins()
     });
   }
 
-  // UTIL
-  private urlBase64ToUint8Array(base64String: string) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
+  // ---------------- UTIL ----------------
 
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
+  private urlBase64ToUint8Array(base64: string) {
+    const padding = '='.repeat((4 - base64.length % 4) % 4);
+    const base64Fixed = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
 
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
+    const raw = window.atob(base64Fixed);
+    const arr = new Uint8Array(raw.length);
+
+    for (let i = 0; i < raw.length; i++) {
+      arr[i] = raw.charCodeAt(i);
     }
 
-    return outputArray;
+    return arr;
   }
 
-  // CLEANUP
   ngOnDestroy() {
     this.sub.unsubscribe();
   }

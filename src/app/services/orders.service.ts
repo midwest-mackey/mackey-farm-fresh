@@ -16,9 +16,7 @@ export class OrdersService {
 
   private apiUrl = environment.apiUrl;
 
-  // ----------------------------
   // 📦 reactive state
-  // ----------------------------
   private hasOrdersSubject = new BehaviorSubject<boolean>(false);
   hasOrders$ = this.hasOrdersSubject.asObservable();
 
@@ -51,7 +49,7 @@ export class OrdersService {
 
   updateSettings(payload: Partial<AppSettings>) {
     return this.http.patch(
-      `${this.apiUrl}/admin/orders/settings`,
+      `${this.apiUrl}/admin/settings`,
       payload
     );
   }
@@ -86,18 +84,13 @@ export class OrdersService {
     return this.settingsSubject.value;
   }
 
-  // =====================================================
   // 💰 PRICING (derived ONLY from settings)
-  // =====================================================
 
   getUnitEggPrice(): number {
     return this.settingsSubject.value?.unitEggPrice ?? 5;
   }
 
-  // =====================================================
   // 🥚 ORDERS
-  // =====================================================
-
   submitOrder(order: any) {
     return this.http.post(
       `${this.apiUrl}/orders/all`,

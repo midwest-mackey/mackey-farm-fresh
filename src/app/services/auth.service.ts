@@ -97,6 +97,13 @@ export class AuthService {
     );
   }
 
+  updateNotificationPreferences(data: any) {
+    return this.http.patch(
+      `${environment.apiUrl}/auth/notifications`,
+      data
+    );
+  }
+
   getAdmins() {
     return this.http.get<any>(
       `${environment.apiUrl}/admin/admins`
