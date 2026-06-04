@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-import { AppRoutingModule } from './app-routing-module';
+import { AppRoutingModule } from './app.routing.module';
 import { App } from './app';
 
 import { BlankLayout } from './layouts/blank-layout/blank-layout';

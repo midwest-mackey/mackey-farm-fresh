@@ -57,13 +57,24 @@ export class PushService {
   async getStatus() {
     const permission = Notification.permission;
 
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
+    if (!navigator.serviceWorker) {
+      return { permission, subscribed: false };
+    }
 
-    return {
-      permission,
-      subscribed: !!sub
-    };
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+
+      return {
+        permission,
+        subscribed: !!sub
+      };
+    } catch (err) {
+      return {
+        permission,
+        subscribed: false
+      };
+    }
   }
 
 }

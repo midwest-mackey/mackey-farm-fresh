@@ -30,7 +30,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminLayout, canActivate: [adminGuard], runGuardsAndResolvers: 'always',
     children: [
       { path: '', component: AdminPage, canActivate: [adminGuard], runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🔐 ADMIN - Mackey\'s Farm Fresh Eggs'},
-      { path: 'settings', component: SettingsPage, canActivate: [adminGuard], runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🔐 ADMIN - Mackey\'s Farm Fresh Eggs'},
+      { path: 'settings', component: SettingsPage, pathMatch: 'full', title: '🔐 ADMIN - Mackey\'s Farm Fresh Eggs'},
     ]
   },
   
