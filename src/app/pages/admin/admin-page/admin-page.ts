@@ -116,13 +116,13 @@ export class AdminPage implements OnInit, OnDestroy {
   // -------------------------
   getStatusClass(status: string) {
     switch (status) {
-      case 'requested': return 'badge text-bg-warning';
-      case 'approved': return 'badge text-bg-success';
-      case 'modified': return 'badge text-bg-danger';
-      case 'ready': return 'badge text-bg-success';
-      case 'completed': return 'badge text-bg-success';
-      case 'cancelled': return 'badge text-bg-dark';
-      default: return 'badge text-bg-primary';
+      case 'requested': return 'text-bg-warning';
+      case 'approved': return 'text-bg-success';
+      case 'modified': return 'text-bg-danger';
+      case 'ready': return 'text-bg-success';
+      case 'completed': return 'text-bg-success';
+      case 'cancelled': return 'text-bg-dark';
+      default: return 'text-bg-primary';
     }
   }
 

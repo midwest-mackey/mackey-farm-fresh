@@ -20,7 +20,8 @@ import {
 @Component({
   selector: 'app-settings-page',
   templateUrl: './settings-page.html',
-  styleUrl: './settings-page.scss'
+  styleUrl: './settings-page.scss',
+  standalone: false
 })
 export class SettingsPage implements OnInit, OnDestroy {
 
@@ -129,7 +130,11 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   async onPushToggle(event: any) {
-    if (event.target.checked) {
+    const enabled = event.target.checked;
+
+    this.pushState.subscribed = enabled; // 🔥 IMPORTANT: immediate sync
+
+    if (enabled) {
       await this.enablePush();
     } else {
       await this.disablePush();
@@ -204,16 +209,25 @@ export class SettingsPage implements OnInit, OnDestroy {
     };
 
     this.authService.updateNotificationPreferences(payload).subscribe({
-      next: () => {
-        this.loadUser(); // 🔥 re-sync truth from server
-        alert('Preferences updated');
-      },
-      error: err => {
-        alert(err?.error?.error || 'Update failed');
-      }
+      next: () => alert('Preferences updated'),
+      error: err => alert(err?.error?.error || 'Update failed')
     });
   }
 
+  updateAccount() {
+    if (this.accountForm.invalid) return;
+
+    const payload = {
+      ...this.accountForm.value,
+      smsEnabled: this.userNotifications.smsEnabled,
+      smsPhoneNumber: this.userNotifications.smsPhoneNumber
+    };
+
+    this.authService.updateAdminAccount(payload).subscribe({
+      next: () => alert('Account updated successfully'),
+      error: err => alert(err?.error?.error || 'Update failed')
+    });
+  }
   // ---------------- ADMINS ----------------
 
   loadAdmins() {
