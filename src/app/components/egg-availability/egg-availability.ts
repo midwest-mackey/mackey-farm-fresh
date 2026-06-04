@@ -21,4 +21,8 @@ export class EggAvailability implements OnInit {
       this.available = settings?.eggsAvailable ?? false;
     });
   }
+  
+  get unitEggPrice(): number {
+    return this.ordersService.getUnitEggPrice();
+  }
 }

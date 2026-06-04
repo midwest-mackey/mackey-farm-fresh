@@ -23,7 +23,7 @@
           </li>
         </ul>
       </div>
-      <a *ngIf="!(auth.auth$ | async)" routerLink="/login" class="btn btn-outline-light border-0 position-absolute top-0 end-0 m-2" id="login-button"><fa-icon [icon]="faLogin"></fa-icon></a>
+      <a *ngIf="!(auth.auth$ | async) && showLoginButton" routerLink="/login" class="btn btn-outline-dark border-0 position-absolute top-0 end-0 m-2" id="login-button">login <fa-icon [icon]="faLogin"></fa-icon></a>
     </div>
   </nav>
     <!-- Content -->

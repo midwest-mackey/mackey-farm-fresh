@@ -10,7 +10,7 @@
       [class.text-success]="available"
       [class.text-danger]="!available"
     >
-      {{ available ? '🥚 Eggs Available' : 'Sold Out — Order now and we\'ll notify you when we can fulfill your order' }}
+      {{ available ? '🥚 Eggs Available - $' + (unitEggPrice) + ' per dozen' : 'Sold Out — Order now and we\'ll notify you when we can fulfill your order' }}
     </p>
 
   </div>
