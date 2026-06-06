@@ -1,6 +1,11 @@
 {
   "name": "Mackey's Farm Fresh Eggs",
   "short_name": "Eggs",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "theme_color": "#FFC107",
+  "background_color": "#FFC107",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -14,8 +19,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "theme_color": "#FFC107",
-  "background_color": "#FFC107",
-  "display": "standalone"
+  ]
 }
