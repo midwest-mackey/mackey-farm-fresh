@@ -22,6 +22,8 @@ export class MainLayout {
   faLogin = faArrowRightToBracket;
   faLogout = faArrowRightFromBracket;
 
+  private tapCount = 0;
+  private tapTimeout: any;
 
   protected readonly title = signal('Mackey\'s Farm Fresh Eggs');
 
@@ -62,5 +64,20 @@ export class MainLayout {
   }
   get showLoginButton(): boolean {
     return localStorage.getItem('hasSeenLogin') === 'true';
+  }
+
+  logoTapped(): void {
+    this.tapCount++;
+
+    if (this.tapCount >= 5) {
+      this.tapCount = 0;
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    clearTimeout(this.tapTimeout);
+    this.tapTimeout = setTimeout(() => {
+      this.tapCount = 0;
+    }, 3000);
   }
 }
