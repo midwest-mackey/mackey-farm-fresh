@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-not-found-page',
@@ -8,4 +9,5 @@ import { Component } from '@angular/core';
 })
 export class NotFoundPage {
 
+  faArrowLeft = faArrowLeft;
 }
