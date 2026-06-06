@@ -44,4 +44,7 @@ export class LoginPage {
       }
     });
   }
+  ngOnInit() {
+    localStorage.setItem('hasSeenLogin', 'true');
+  }
 }

@@ -60,5 +60,7 @@ export class MainLayout {
     this.auth.logout();
     this.router.navigate(['/']);
   }
-
+  get showLoginButton(): boolean {
+    return localStorage.getItem('hasSeenLogin') === 'true';
+  }
 }
