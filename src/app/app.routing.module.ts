@@ -17,25 +17,25 @@ const routes: Routes = [
   // { path: '', redirectTo: '', pathMatch: 'full' },
   { path: '', component: MainLayout,
     children: [
-      { path: '', component: HomePage, pathMatch: 'full', title: '🐔 Mackey\'s Farm Fresh Eggs - Home'},
-      { path: 'more-items', component: MoreItems, pathMatch: 'full', title: '🐔 Mackey\'s Farm Fresh Eggs - More Items'},
-      { path: 'orders', component: Orders, runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🐔 Mackey\'s Farm Fresh Eggs - Orders'},
+      { path: '', component: HomePage, pathMatch: 'full', title: '🐔 The Coop • Mackey\'s Farm Fresh Eggs'},
+      { path: 'garden', component: MoreItems, pathMatch: 'full', title: '🌱 The Garden • Mackey\'s Farm Fresh Eggs'},
+      { path: 'orders', component: Orders, runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🧺 Orders • Mackey\'s Farm Fresh Eggs'},
     ]
   },
   { path: 'login', component: BlankLayout,
     children: [
-      { path: '', component: LoginPage, pathMatch: 'full', title: '🔑 LOGIN -  Mackey\'s Farm Fresh Eggs'},
+      { path: '', component: LoginPage, pathMatch: 'full', title: '🔑 LOGIN •  Mackey\'s Farm Fresh Eggs'},
     ]
   },
   { path: 'admin', component: AdminLayout, canActivate: [adminGuard], runGuardsAndResolvers: 'always',
     children: [
-      { path: '', component: AdminPage, canActivate: [adminGuard], runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🔐 ADMIN - Mackey\'s Farm Fresh Eggs'},
-      { path: 'settings', component: SettingsPage, canActivate: [adminGuard], runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🔐 ADMIN - Mackey\'s Farm Fresh Eggs'},
+      { path: '', component: AdminPage, canActivate: [adminGuard], runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🔐  All Orders • Mackey\'s Farm Fresh Eggs'},
+      { path: 'settings', component: SettingsPage, canActivate: [adminGuard], runGuardsAndResolvers: 'always', pathMatch: 'full', title: '🔐 Settings • Mackey\'s Farm Fresh Eggs'},
     ]
   },
   
   // 404 route (ALWAYS last)
-  {path: '**', component: NotFoundPage, title: '404 - Page Not Found'},
+  {path: '**', component: NotFoundPage, title: '🫠 404 - Page Not Found'},
 ];
 
 @NgModule({
