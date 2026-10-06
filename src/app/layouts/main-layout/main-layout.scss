@@ -7,3 +7,13 @@
         color: #fff !important;
     }
 }
+
+.webworks-logo {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask: url('/assets/mm-logo.svg') center / contain no-repeat;
+    mask: url('/assets/mm-logo.svg') center / contain no-repeat;
+}
