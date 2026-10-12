@@ -18,6 +18,8 @@ import { faArrowRight, faArrowRightToBracket, faArrowRightFromBracket } from '@f
 })
 export class MainLayout {
 
+  readonly currentYear = new Date().getFullYear();
+
   faArrowRight = faArrowRight;
   faLogin = faArrowRightToBracket;
   faLogout = faArrowRightFromBracket;
