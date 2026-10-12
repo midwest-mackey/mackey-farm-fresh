@@ -11,6 +11,8 @@ import { faArrowLeft, faCircleUser } from '@fortawesome/free-solid-svg-icons';
 })
 export class AdminLayout {
 
+  readonly currentYear = new Date().getFullYear();
+
   faArrowLeft = faArrowLeft;
   faCircleUser = faCircleUser;
   constructor(
