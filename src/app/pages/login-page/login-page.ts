@@ -14,6 +14,8 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 export class LoginPage {
 
+  readonly currentYear = new Date().getFullYear();
+
   faArrowLeft = faArrowLeft;
   error = false;
   loginForm: FormGroup;
