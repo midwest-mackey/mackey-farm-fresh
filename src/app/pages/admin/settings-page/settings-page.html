@@ -64,7 +64,7 @@
                                         <td>{{ admin.email }}</td>
                                         <td><span class="badge bg-primary">{{ admin.role }}</span></td>
                                         <td>{{ admin.createdAt | date:'medium' }}</td>
-                                        <td><button [disabled]="admin.id === 1" class="btn btn-sm btn-outline-danger border-0" (click)="deleteAdmin(admin)"><fa-icon [icon]="faTrash"></fa-icon></button></td>
+                                        <td><button class="btn btn-sm btn-outline-danger border-0" (click)="deleteAdmin(admin)"><fa-icon [icon]="faTrash"></fa-icon></button></td>
                                     </tr>
                                 </tbody>
                             </table>
