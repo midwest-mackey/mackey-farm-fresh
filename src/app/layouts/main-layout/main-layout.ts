@@ -18,6 +18,9 @@ import { faArrowRight, faArrowRightToBracket, faArrowRightFromBracket } from '@f
 })
 export class MainLayout {
 
+  preloaderVisible = true;
+  siteRevealed = false;
+
   readonly currentYear = new Date().getFullYear();
 
   faArrowRight = faArrowRight;

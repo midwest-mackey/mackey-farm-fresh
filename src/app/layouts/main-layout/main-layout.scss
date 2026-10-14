@@ -1,3 +1,17 @@
+.site-loading {
+    opacity: 0;
+    transform: translateY(-28px);
+}
+
+#app-shell {
+    transition: opacity 750ms 150ms ease, transform 950ms cubic-bezier(.22, .8, .3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #app-shell { transition: none; }
+    .site-loading { transform: none; }
+}
+
 .nav-link {
     &:hover {
         outline: 1px solid #212529 !important;
