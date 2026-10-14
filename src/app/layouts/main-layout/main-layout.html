@@ -1,9 +1,9 @@
-<app-preloader *ngIf="preloaderVisible" (reveal)="siteRevealed = true" (finished)="preloaderVisible = false"></app-preloader>
-<div id="app-shell" class="bg-body" [class.site-loading]="!siteRevealed" [attr.inert]="preloaderVisible ? '' : null">
+<app-preloader *ngIf="preloaderVisible" (reveal)="revealSite()" (finished)="finishPreloader()"></app-preloader>
+<div id="app-shell" class="bg-body" [class.site-loading]="!siteRevealed" [class.site-entering]="revealAnimating" [attr.inert]="preloaderVisible ? '' : null">
   <nav class="navbar bg-warning">
     <div class="container-fluid justify-content-center">
       <a routerLink="/">
-        <img src="assets/logo.png" alt="Logo" width="180"  class="d-inline-block align-text-center">
+        <img src="assets/logo.png" alt="Logo" width="180"  class="site-logo d-inline-block align-text-center">
       </a>
       <div class="navbar-collapse">
         <ul class=" nav nav-pills col gap-2 justify-content-center">
