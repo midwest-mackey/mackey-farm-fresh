@@ -1,0 +1,10 @@
+<div class="coop-preloader" [class.leaving]="leaving" role="status" aria-live="polite" aria-label="Loading Mackey's Farm Fresh">
+  <div class="loader-content">
+    <p class="brand space-mono-bold">Mackey’s Farm Fresh</p>
+    <img class="illustration" [src]="scene.image" alt="" width="300" height="260"
+      fetchpriority="high" (load)="imageReady()" (error)="imageReady()">
+    <h1 class="sigmar-regular">{{ scene.message }}</h1>
+    <p class="caption">{{ scene.caption }}</p>
+    <div class="loading-eggs" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+</div>
