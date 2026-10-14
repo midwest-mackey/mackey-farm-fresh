@@ -1,4 +1,4 @@
-<app-coop-preloader *ngIf="preloaderVisible" (reveal)="siteRevealed = true" (finished)="preloaderVisible = false"></app-coop-preloader>
+<app-preloader *ngIf="preloaderVisible" (reveal)="siteRevealed = true" (finished)="preloaderVisible = false"></app-preloader>
 <div id="app-shell" class="bg-body" [class.site-loading]="!siteRevealed" [attr.inert]="preloaderVisible ? '' : null">
   <nav class="navbar bg-warning">
     <div class="container-fluid justify-content-center">

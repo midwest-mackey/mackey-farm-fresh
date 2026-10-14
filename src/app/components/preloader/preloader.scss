@@ -4,7 +4,7 @@
   z-index: 2000;
 }
 
-.coop-preloader {
+.preloader {
   display: grid;
   place-items: center;
   height: 100%;
@@ -89,6 +89,6 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coop-preloader, .loader-content { transition: none; }
+  .preloader, .loader-content { transition: none; }
   .brand, .illustration, h1, .caption, .loading-eggs span { animation: none; }
 }

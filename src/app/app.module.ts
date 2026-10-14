@@ -20,7 +20,7 @@ import { AdminPage } from './pages/admin/admin-page/admin-page';
 import { LoginPage } from './pages/login-page/login-page';
 
 import { EggAvailability } from './components/egg-availability/egg-availability';
-import { CoopPreloader } from './components/coop-preloader/coop-preloader';
+import { Preloader } from './components/preloader/preloader';
 import { EggOrderForm } from './components/egg-order-form/egg-order-form';
 import { Orders } from './pages/orders/orders';
 import { MoreItems } from './pages/more-items/more-items';
@@ -31,7 +31,7 @@ import { SettingsPage } from './pages/admin/settings-page/settings-page';
   declarations: [
     App,
     EggAvailability,
-    CoopPreloader,
+    Preloader,
     HomePage,
     NotFoundPage,
     EggOrderForm,

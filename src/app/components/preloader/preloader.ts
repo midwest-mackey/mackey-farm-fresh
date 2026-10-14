@@ -4,12 +4,12 @@ import {
 } from '@angular/core';
 
 @Component({
-  selector: 'app-coop-preloader',
+  selector: 'app-preloader',
   standalone: false,
-  templateUrl: './coop-preloader.html',
-  styleUrl: './coop-preloader.scss'
+  templateUrl: './preloader.html',
+  styleUrl: './preloader.scss'
 })
-export class CoopPreloader implements OnInit, OnDestroy {
+export class Preloader implements OnInit, OnDestroy {
   @Output() reveal = new EventEmitter<void>();
   @Output() finished = new EventEmitter<void>();
 
