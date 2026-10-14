@@ -18,6 +18,9 @@ import { faArrowRight, faArrowRightToBracket, faArrowRightFromBracket } from '@f
 })
 export class MainLayout {
 
+  private static preloaderShown = false;
+  private readonly preloaderSessionKey = 'farmFreshPreloaderShown';
+
   preloaderVisible = true;
   siteRevealed = false;
 
@@ -38,6 +41,7 @@ export class MainLayout {
   constructor(private ordersService: OrdersService, public auth: AuthService, private router: Router) {}
 
   ngOnInit() {
+    this.initializePreloader();
     this.hasOrders$ = this.ordersService.hasOrders$;
     this.ordersService.refreshOrderState();
     this.ordersService.refreshSettings();
@@ -48,6 +52,22 @@ export class MainLayout {
     });
 
     this.updatePageBackground();
+  }
+
+  private initializePreloader(): void {
+    if (typeof window === 'undefined') return;
+
+    let alreadyShown = MainLayout.preloaderShown;
+    try {
+      alreadyShown = alreadyShown || sessionStorage.getItem(this.preloaderSessionKey) === 'true';
+      sessionStorage.setItem(this.preloaderSessionKey, 'true');
+    } catch {
+      // Keep navigation from replaying the intro when browser storage is unavailable.
+    }
+
+    MainLayout.preloaderShown = true;
+    this.preloaderVisible = !alreadyShown;
+    this.siteRevealed = alreadyShown;
   }
 
   @HostListener('window:scroll')
