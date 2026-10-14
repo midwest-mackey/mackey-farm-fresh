@@ -16,8 +16,7 @@ export class Preloader implements OnInit, OnDestroy {
   readonly scenes = [
     { image: 'assets/chicken.png', message: 'Getting the coop ready', caption: 'A little farm-fresh goodness is on its way.' },
     { image: 'assets/eggs-carton.png', message: 'Checking for eggs', caption: 'Counting today’s little golden treasures.' },
-    { image: 'assets/chicken.png', message: 'Our chickens are on vacation', caption: 'Even the hardest-working hens need a break.' },
-    { image: 'assets/404.png', message: 'Oops. One egg short.', caption: 'Making sure all our eggs are in one basket.' }
+    { image: 'assets/chicken.png', message: 'Our chickens are on vacation', caption: 'Even the hardest-working hens need a break.' }
   ];
 
   scene = this.scenes[0];
