@@ -23,6 +23,7 @@ export class MainLayout {
 
   preloaderVisible = true;
   siteRevealed = false;
+  revealAnimating = false;
 
   readonly currentYear = new Date().getFullYear();
 
@@ -52,6 +53,16 @@ export class MainLayout {
     });
 
     this.updatePageBackground();
+  }
+
+  revealSite(): void {
+    this.siteRevealed = true;
+    this.revealAnimating = true;
+  }
+
+  finishPreloader(): void {
+    this.preloaderVisible = false;
+    this.revealAnimating = false;
   }
 
   private initializePreloader(): void {

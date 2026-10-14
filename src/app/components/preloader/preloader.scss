@@ -13,7 +13,7 @@
   padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
   // The curved yellow edge recedes to uncover the site's own flowing background.
   clip-path: ellipse(150% 150% at 50% 0%);
-  transition: clip-path 950ms cubic-bezier(.65, 0, .25, 1);
+  transition: clip-path 950ms cubic-bezier(.65, 0, .25, 1), opacity 650ms 100ms ease;
 }
 
 .loader-content {
@@ -69,6 +69,7 @@ h1 {
 }
 
 .leaving {
+  opacity: 0;
   clip-path: ellipse(150% 0% at 50% 0%);
   .loader-content { opacity: 0; transform: translateY(-35px); }
 }
